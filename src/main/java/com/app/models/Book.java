@@ -1,6 +1,7 @@
 package com.app.models;
 import java.io.Serializable;
 import javax.persistence.*;
+import com.app.views.*;
 
 @Entity
 @Table(name = "book")
@@ -9,18 +10,25 @@ public class Book implements Serializable {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	private long id;
+	public long id;
 	
 	@Column(name = "title")
-	private String title;
+	public String title;
  
 	@Column(name = "author")
-	private String author;
+	public String author;
 	
 	public Book(String title, String author) {
 		this.title = title;
 		this.author = author;
 	}
 	
+	public Book() {
+	}
+	
+	@Override
+	public String toString() {
+		return String.format("Book[id=%d, title='%s', author='%s']", id, title, author);
+	}
 	
 }
