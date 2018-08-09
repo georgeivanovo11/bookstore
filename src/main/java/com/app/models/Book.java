@@ -1,7 +1,6 @@
 package com.app.models;
 import java.io.Serializable;
 import javax.persistence.*;
-import com.app.views.*;
 
 @Entity
 @Table(name = "book")
@@ -9,6 +8,7 @@ public class Book implements Serializable {
 	private static final long serialVersionUID = -3009157732242241606L;
 	
 	@Id
+	@Column(name = "book_id")
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	public long id;
 	

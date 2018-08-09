@@ -5,6 +5,7 @@ import java.util.Optional;
 import javax.persistence.EntityNotFoundException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +24,7 @@ public class BookService {
 	@Autowired
     private BookRepository repository;
 	
-	public ResponseEntity createBook(Book book) {
+	public ResponseEntity<HttpStatus> createBook(Book book) {
 		if(repository.existsById(book.id)) {
 			book.id=0;
 		}
@@ -46,7 +47,7 @@ public class BookService {
         return books;
     }
 	
-	public ResponseEntity deleteBook(Long id) throws EntityNotFoundException {
+	public ResponseEntity<HttpStatus> deleteBook(Long id) throws EntityNotFoundException {
 		Optional<Book> book = repository.findById(id);
 		if (!book.isPresent()) {
 			String message = "Book with id: " + id + " doesn't exist!";
@@ -56,7 +57,7 @@ public class BookService {
         return new ResponseEntity<>(NO_CONTENT);
 	}
 	
-	public ResponseEntity updateBook(Book book) {
+	public ResponseEntity<HttpStatus> updateBook(Book book) {
 		if(!repository.existsById(book.id)) {
 			String message = "Book with id: " + book.id + " doesn't exist!";
 			throw new EntityNotFoundException(message);
