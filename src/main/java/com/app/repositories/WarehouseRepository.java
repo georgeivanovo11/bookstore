@@ -6,6 +6,8 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import com.app.models.*;
 
-public interface StoreRepository extends JpaRepository<Store, Long>{
-	Optional<Store> findByTitle(String title);
+public interface WarehouseRepository extends JpaRepository<Warehouse, Long>{
+	Optional<Warehouse> findByBook_id(long id);
+
 }
+

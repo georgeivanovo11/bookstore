@@ -1,5 +1,9 @@
 package com.app.controllers;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.persistence.EntityNotFoundException;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +13,10 @@ import org.springframework.web.bind.annotation.*;
 
 import com.app.models.*;
 import com.app.services.*;
+import com.app.views.*;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RestController
 public class BookController {
@@ -17,27 +25,50 @@ public class BookController {
 	private BookService service;
 
 	@PostMapping("/books")
-	public @ResponseBody ResponseEntity<HttpStatus> createOne(@RequestBody Book book){
-		return service.createBook(book);
+	public @ResponseBody ResponseEntity<BookView> createOne(@RequestBody BookView view){
+		Book receivedBook = new Book(view);
+		Book savedBook = service.createBook(receivedBook);
+		BookView savedBookView = new BookView(savedBook);
+		return new ResponseEntity<BookView>(savedBookView, HttpStatus.CREATED);
 	}
 	
 	@GetMapping("/books")
-	public @ResponseBody Book getOne(@RequestParam("id") long id) throws EntityNotFoundException {
-		return service.getBook(id);
+	public @ResponseBody BookView getOne(@RequestParam("id") long id) throws EntityNotFoundException {
+		return new BookView(service.getBook(id));
 	}
 	
 	@GetMapping("/books/all")
-	public @ResponseBody Iterable<Book> getAll() {
-		return service.getAllBooks();
+	public @ResponseBody List<BookView> getAll() {
+		Iterable<Book> books = service.getAllBooks();
+		List<BookView> bookViews = new ArrayList<BookView>();
+		for (Book book : books) {
+		    bookViews.add(new BookView(book));
+		}
+		return bookViews;
 	}
 	
-	@DeleteMapping("/books")
-	public @ResponseBody ResponseEntity<HttpStatus> deleteOne(@RequestParam("id") long id) throws EntityNotFoundException {
-		return service.deleteBook(id);
+	@PostMapping("/delivery")
+	public @ResponseBody ResponseEntity<String> delivery(@RequestBody String str) throws JsonParseException, JsonMappingException, IOException{
+		ObjectMapper objectMapper = new ObjectMapper();
+		DeliveryView view = objectMapper.readValue(str, DeliveryView.class);
+		int count = service.createDelivery(view);
+		String message = "Number of saved book is " + count;
+		return new ResponseEntity<String>(message,HttpStatus.CREATED);
 	}
 	
-	@PutMapping("/books")
-	public @ResponseBody ResponseEntity<HttpStatus> updateOne(@RequestBody Book book) throws EntityNotFoundException {
-		return service.updateBook(book);
-	}
+//	@PostMapping("/delivery")
+//	public @ResponseBody ResponseEntity<HttpStatus> delivery(@RequestBody String str) throws JsonParseException, JsonMappingException, IOException{
+//		
+//	}
+	
+//	@DeleteMapping("/books")
+//	public @ResponseBody ResponseEntity<HttpStatus> deleteOne(@RequestParam("id") long id) throws EntityNotFoundException {
+//		return service.deleteBook(id);
+//	}
+//	
+//	@PutMapping("/books")
+//	public @ResponseBody ResponseEntity<HttpStatus> updateOne(@RequestBody BookView view) throws EntityNotFoundException {
+//		Book book = new Book(view);
+//		return service.updateBook(book);
+//	}
 }

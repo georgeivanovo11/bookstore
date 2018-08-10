@@ -1,34 +1,75 @@
 package com.app.models;
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
+
 import javax.persistence.*;
+
+import com.app.views.BookView;
 
 @Entity
 @Table(name = "book")
-public class Book implements Serializable {
-	private static final long serialVersionUID = -3009157732242241606L;
+public class Book {
 	
-	@Id
-	@Column(name = "book_id")
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	public long id;
+	private long id;
+    private String title;
+	private String author;
+    private Warehouse warehouse;
 	
-	@Column(name = "title")
-	public String title;
- 
-	@Column(name = "author")
-	public String author;
+	public Book() 
+	{}
+	
+	public Book(String title, String author, Warehouse warehouse) {
+		this.title = title;
+		this.author = author;
+		this.warehouse = warehouse;
+	}
 	
 	public Book(String title, String author) {
 		this.title = title;
 		this.author = author;
 	}
 	
-	public Book() {
+	public Book(BookView view) {
+		this.title = view.title;
+		this.author = view.author;
 	}
 	
-	@Override
-	public String toString() {
-		return String.format("Book[id=%d, title='%s', author='%s']", id, title, author);
+	@Id
+	@Column(name = "book_id")
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	public long getId() {
+        return this.id;
+    }
+	
+	public void setId(long id){
+		this.id = id;
 	}
 	
+	@Column(name = "title")
+	public String getTitle() {
+        return this.title;
+    }
+	
+	public void setTitle(String title){
+		this.title = title;
+	}
+ 
+	@Column(name = "author")
+	public String getAuthor(){
+        return this.author;
+    }
+	
+	public void setAuthor(String author){
+		this.author = author;
+	}
+	
+	@OneToOne(mappedBy = "book")
+    public Warehouse getWarehouse() {
+        return this.warehouse;
+    }
+
+    public void setWarehouse(Warehouse warehouse) {
+    	this.warehouse = warehouse;
+    }
 }

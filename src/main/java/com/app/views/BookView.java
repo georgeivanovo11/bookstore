@@ -1,7 +1,5 @@
 package com.app.views;
 
-import java.io.Serializable;
-
 import com.app.models.*;
 
 public class BookView {
@@ -17,8 +15,8 @@ public class BookView {
 	}
 	
 	public BookView(Book book){
-		this.id = book.id;
-		this.title = book.title;
-		this.author = book.author;
+	    this.id = book.getId();
+	    this.title = book.getTitle();
+	    this.author = book.getAuthor();
 	}
 }

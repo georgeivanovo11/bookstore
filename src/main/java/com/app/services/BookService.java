@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import com.app.models.*;
 import com.app.repositories.*;
+import com.app.views.*;
 
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.CREATED;
@@ -24,13 +25,14 @@ public class BookService {
 	@Autowired
     private BookRepository repository;
 	
-	public ResponseEntity<HttpStatus> createBook(Book book) {
-		if(repository.existsById(book.id)) {
-			book.id=0;
+	@Autowired
+	private WarehouseRepository wRepository;
+	
+	public Book createBook(Book book) {
+		if(repository.existsById(book.getId())) {
+			book.setId(0);
 		}
-        repository.save(book);
-        return new ResponseEntity<>(CREATED);
-
+        return repository.save(book);
     }
 	
 	public Book getBook(Long id) throws EntityNotFoundException {
@@ -47,22 +49,47 @@ public class BookService {
         return books;
     }
 	
-	public ResponseEntity<HttpStatus> deleteBook(Long id) throws EntityNotFoundException {
-		Optional<Book> book = repository.findById(id);
-		if (!book.isPresent()) {
-			String message = "Book with id: " + id + " doesn't exist!";
-            throw new EntityNotFoundException(message);
-        }
-		repository.delete(book.get());
-        return new ResponseEntity<>(NO_CONTENT);
-	}
-	
-	public ResponseEntity<HttpStatus> updateBook(Book book) {
-		if(!repository.existsById(book.id)) {
-			String message = "Book with id: " + book.id + " doesn't exist!";
-			throw new EntityNotFoundException(message);
+	public int createDelivery(DeliveryView view) {
+		int numberOfSavedBook=0;
+		for(BookItemView item: view.books) {
+			Optional<Book> _book = repository.findById(item.id);
+			if (!_book.isPresent()) {
+				continue;
+	        }
+			Book book = _book.get();
+			Warehouse whouse;
+			Optional<Warehouse> _whouse = wRepository.findByBook_id(book.getId());
+			if (!_whouse.isPresent()) {
+				whouse = new Warehouse(book,item.amount, item.price);
+	        }
+			else {
+				whouse = _whouse.get();
+				int amount = whouse.getAmount();
+				whouse.setAmount(amount+item.amount);
+				whouse.setPrice(item.price);
+			}
+			wRepository.save(whouse);
+			numberOfSavedBook++;
 		}
-		repository.save(book);
-        return new ResponseEntity<>(ACCEPTED);
-	}
+		return numberOfSavedBook;
+    }
+	
+//	public ResponseEntity<HttpStatus> deleteBook(Long id) throws EntityNotFoundException {
+//		Optional<Book> book = repository.findById(id);
+//		if (!book.isPresent()) {
+//			String message = "Book with id: " + id + " doesn't exist!";
+//            throw new EntityNotFoundException(message);
+//        }
+//		repository.delete(book.get());
+//        return new ResponseEntity<>(NO_CONTENT);
+//	}
+//	
+//	public ResponseEntity<HttpStatus> updateBook(Book book) {
+//		if(!repository.existsById(book.getId())) {
+//			String message = "Book with id: " + book.getId() + " doesn't exist!";
+//			throw new EntityNotFoundException(message);
+//		}
+//		repository.save(book);
+//        return new ResponseEntity<>(ACCEPTED);
+//	}
 }
