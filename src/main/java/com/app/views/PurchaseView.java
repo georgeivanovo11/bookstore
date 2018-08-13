@@ -13,7 +13,7 @@ public class PurchaseView {
 	}
 	
 	public PurchaseView(Purchase purchase){
-		this.status = purchase.getSatus();
+		this.status = purchase.getStatus();
 		this.totalPayment = purchase.getTotalPayment();
 		this.customer_id = purchase.getCustomer().getId();
 		

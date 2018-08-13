@@ -58,7 +58,7 @@ public class Purchase  {
 		this.id = id;
 	}
 	
-	public String getSatus() {
+	public String getStatus() {
         return this.status;
     }
 	

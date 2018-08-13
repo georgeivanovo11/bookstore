@@ -17,6 +17,8 @@ import com.app.views.*;
 @RestController
 public class CustomerController {
 	
+	int i=0;
+	
 	@Autowired
 	private CustomerService service;
 
@@ -40,6 +42,25 @@ public class CustomerController {
 	public @ResponseBody ResponseEntity<HttpStatus> updateOne(@RequestBody CustomerView view) throws EntityNotFoundException {
 		service.changeMoney(view.id, view.balance);
 		return new ResponseEntity<HttpStatus>(HttpStatus.OK);
+	}
+	
+	
+	@GetMapping("/customers/purchases")
+	public @ResponseBody List<PurchaseView> getAllPurchases(@RequestParam("id") long id) throws EntityNotFoundException {
+		List<Purchase> purchases = service.getPurchases(id);
+		List<PurchaseView> purchaseViews = new ArrayList<PurchaseView>();
+		for (Purchase p : purchases) {
+			PurchaseView pv = new PurchaseView(p);
+			pv.books = new long [p.getPurchasebooks().size()];
+			i=0;
+			p.getPurchasebooks().forEach(item -> {
+				pv.books[i]=item.getBook().getId();
+				i++;
+			});
+			purchaseViews.add(pv);
+			
+		}
+		return purchaseViews;
 	}
 	
 }

@@ -24,10 +24,14 @@ import static org.springframework.http.HttpStatus.ACCEPTED;
 public class PurchaseService {
 	
 	long STORE_ID = 56;
+	double totalPayment = 0;
 	int i;
 	
 	@Autowired
     private CustomerRepository customerRepository;
+	
+	@Autowired
+    private WarehouseRepository warehouseRepository;
 	
 	@Autowired
     private PurchaseRepository purchaseRepository;
@@ -37,6 +41,15 @@ public class PurchaseService {
 
 	@Autowired
     private StoreRepository storeRepository;
+	
+	public Purchase getPurchase(long id) {
+		Optional<Purchase> purchase = purchaseRepository.findById(id);
+		if (!purchase.isPresent()) {
+			String message = "Purchase with id: " + id + " doesn't exist!";
+            throw new EntityNotFoundException(message);
+        }
+        return purchase.get();
+    }
 	
 	public long createPurchase(PurchaseView view) {
 		
@@ -114,14 +127,38 @@ public class PurchaseService {
 		return saved.getId();
     }
 	
-	public Purchase getPurchase(long id) {
-		Optional<Purchase> purchase = purchaseRepository.findById(id);
-		if (!purchase.isPresent()) {
+	public void cancelPurchase(long id) throws EntityNotFoundException {
+		Optional<Purchase> _purchase = purchaseRepository.findById(id);
+		if (!_purchase.isPresent()) {
 			String message = "Purchase with id: " + id + " doesn't exist!";
             throw new EntityNotFoundException(message);
         }
-        return purchase.get();
-    }
+		Purchase purchase = _purchase.get();
+//		if (purchase.getStatus().equals("cancel")) {
+//			String message = "The purchase has already canceled!";
+//            throw new EntityNotFoundException(message);
+//        }
+		totalPayment = 0;
+		purchase.getPurchasebooks().forEach(item ->{
+			Warehouse wh = item.getBook().getWarehouse();
+			int oldAmount = wh.getAmount();
+			totalPayment += wh.getPrice();
+			wh.setAmount(++oldAmount);
+			warehouseRepository.save(wh);
+		});
+		Optional<Store> _store = storeRepository.findById(STORE_ID);
+		if(_store.isPresent()) {
+			Store store = _store.get();
+			store.setBalance(store.getBalance() - totalPayment);
+			storeRepository.save(store);
+		}
+		
+		Customer customer= purchase.getCustomer();
+		customer.setBalance(customer.getBalance() + totalPayment);
+		
+		purchase.setStatus("cancel");
+		purchaseRepository.save(purchase);
+	}
 	
 	public StatisticsView getStatistics() {
 		StatisticsView view = new StatisticsView();
@@ -165,7 +202,7 @@ public class PurchaseService {
 		for(Purchase p: purchases) {
 			PurchaseView pv = new PurchaseView();
 			pv.id = p.getId();
-			pv.status = p.getSatus();
+			pv.status = p.getStatus();
 			pv.customer_id = p.getCustomer().getId();
 			pv.totalPayment = p.getTotalPayment();
 			pv.books = new long [p.getPurchasebooks().size()];

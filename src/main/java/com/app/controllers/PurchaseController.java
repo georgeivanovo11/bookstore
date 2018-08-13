@@ -31,6 +31,12 @@ public class PurchaseController {
 		return new ResponseEntity<IdView>(newView, HttpStatus.CREATED);
 	}
 	
+	@PutMapping("/purchases/cancel")
+	public @ResponseBody ResponseEntity<HttpStatus> cancelOne(@RequestParam("id") long id) throws EntityNotFoundException{
+		service.cancelPurchase(id);
+		return new ResponseEntity<HttpStatus>(HttpStatus.OK);
+	}
+	
 	@GetMapping("/purchases")
 	public @ResponseBody PurchaseView getOne(@RequestParam("id") long id) throws EntityNotFoundException {
 		return new PurchaseView(service.getPurchase(id));

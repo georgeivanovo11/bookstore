@@ -1,5 +1,6 @@
 package com.app.services;
 
+import java.util.List;
 import java.util.Optional;
 
 import javax.persistence.EntityNotFoundException;
@@ -47,5 +48,15 @@ public class CustomerService {
         Customer customer = _customer.get();
         customer.setBalance(money);
         repository.save(customer);
+	}
+	
+	public List<Purchase> getPurchases(long id){
+		Optional<Customer> _customer = repository.findById(id);
+		if (!_customer.isPresent()) {
+			String message = "Book with id: " + id + " doesn't exist!";
+            throw new EntityNotFoundException(message);
+        }
+        Customer customer = _customer.get();
+        return customer.getPurchases();
 	}
 }
