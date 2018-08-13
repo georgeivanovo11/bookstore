@@ -5,7 +5,9 @@ import java.util.Set;
 
 import javax.persistence.*;
 
-import com.app.views.BookView;
+import com.app.views.*;
+import com.app.models.*;
+
 
 @Entity
 @Table(name = "book")
@@ -15,7 +17,8 @@ public class Book {
     private String title;
 	private String author;
     private Warehouse warehouse;
-	
+    private Set<Purchasebook> purchasebooks;
+
 	public Book() 
 	{}
 	
@@ -23,6 +26,7 @@ public class Book {
 		this.title = title;
 		this.author = author;
 		this.warehouse = warehouse;
+        purchasebooks = new HashSet<>();
 	}
 	
 	public Book(String title, String author) {
@@ -71,5 +75,14 @@ public class Book {
 
     public void setWarehouse(Warehouse warehouse) {
     	this.warehouse = warehouse;
+    }
+    
+    @OneToMany(mappedBy = "book",  cascade = CascadeType.ALL, orphanRemoval = true)
+    public Set<Purchasebook> getPurchasebooks() {
+        return this.purchasebooks;
+    }
+
+    public void setPurchasebooks(Set<Purchasebook> purchasebooks) {
+        this.purchasebooks = purchasebooks;
     }
 }

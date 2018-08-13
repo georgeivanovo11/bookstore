@@ -15,7 +15,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-import com.app.views.StoreView;
+import com.app.views.*;
+import com.app.models.*;
 
 @Entity
 @Table(name = "purchase")
@@ -35,14 +36,17 @@ public class Purchase  {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "customer_id")
     private Customer customer;
+	
+    @OneToMany(mappedBy = "purchase")
+    private Set<Purchasebook> purchasebooks;
+
 
 	public Purchase()
 	{}
 	
-	public Purchase(String status, double totalPayment) {
+	public Purchase(String status) {
 		this.status = status;
-		this.totalPayment = totalPayment;
-		this.customer = new Customer();
+        purchasebooks = new HashSet<>();
 	}
 	
 	
@@ -77,6 +81,14 @@ public class Purchase  {
 	
 	public void setCustomer(Customer customer) {
         this.customer = customer;
+    }
+	
+	public Set<Purchasebook> getPurchasebooks() {
+        return this.purchasebooks;
+    }
+
+    public void setPurchasebooks(Set<Purchasebook> purchasebooks) {
+        this.purchasebooks = purchasebooks;
     }
 	
 }

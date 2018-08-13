@@ -1,5 +1,7 @@
 package com.app.services;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import javax.persistence.EntityNotFoundException;
@@ -47,6 +49,19 @@ public class BookService {
 	public Iterable<Book> getAllBooks() {
 		Iterable<Book> books = repository.findAll();
         return books;
+    }
+	
+	public List<BookViewWithAmount> getAllBooksWithAmount() {
+		Iterable<Book> books = repository.findAll();
+		List<BookViewWithAmount> views = new ArrayList<BookViewWithAmount>();
+		for(Book book: books) {
+			BookViewWithAmount view = new BookViewWithAmount();
+			view.id = book.getId();
+			view.title = book.getTitle();
+			view.amount = book.getWarehouse().getAmount();
+			views.add(view);
+		}
+        return views;
     }
 	
 	public int createDelivery(DeliveryView view) {

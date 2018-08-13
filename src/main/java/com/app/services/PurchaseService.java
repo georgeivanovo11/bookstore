@@ -1,5 +1,7 @@
 package com.app.services;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -26,6 +28,9 @@ public class PurchaseService {
 	
 	@Autowired
     private PurchaseRepository purchaseRepository;
+	
+	@Autowired
+    private BookRepository bookRepository;
 
 	
 	public ResponseEntity<HttpStatus> createPurchase(PurchaseView view) {
@@ -36,12 +41,31 @@ public class PurchaseService {
         }
 		Customer customer = _customer.get();
 		
-		Purchase purchase = new Purchase();
-		purchase.setStatus("pending");
-		purchase.setTotalPayment(100);
+		Purchase purchase = new Purchase("pending");
+		purchase.setCustomer(customer);
 		
-		customer.addPurchase(purchase);
-		customerRepository.save(customer);
+		List<Long> notFoundArray = new ArrayList<Long>();
+		for(long item: view.books) {
+			Optional<Book> _book = bookRepository.findById(item);
+			if (!_book.isPresent()) {
+				notFoundArray.add(item);
+				continue;
+	        }
+			Book book = _book.get();
+			int amount = book.getWarehouse().getAmount();
+			if(amount<=0) {
+				notFoundArray.add(item);
+				continue;
+			}
+			book.getWarehouse().setAmount(amount-1);
+			Purchasebook pb = new Purchasebook(book,purchase,1);
+			book.getPurchasebooks().add(pb);
+			purchaseRepository.save(purchase);
+			bookRepository.save(book);	
+
+		}
+		purchase.setTotalPayment(100);
+		purchaseRepository.save(purchase);
 		return new ResponseEntity<>(CREATED);
     }
 	

@@ -47,6 +47,11 @@ public class BookController {
 		return bookViews;
 	}
 	
+	@GetMapping("/books/all/amount")
+	public @ResponseBody List<BookViewWithAmount> getAllWithAmount() {
+		return service.getAllBooksWithAmount();
+	}
+	
 	@PostMapping("/delivery")
 	public @ResponseBody ResponseEntity<String> delivery(@RequestBody String str) throws JsonParseException, JsonMappingException, IOException{
 		ObjectMapper objectMapper = new ObjectMapper();
