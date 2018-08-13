@@ -59,6 +59,7 @@ public class BookService {
 			view.id = book.getId();
 			view.title = book.getTitle();
 			view.amount = book.getWarehouse().getAmount();
+			view.price = book.getWarehouse().getPrice();
 			views.add(view);
 		}
         return views;

@@ -26,12 +26,18 @@ public class PurchaseController {
 	private PurchaseService service;
 
 	@PostMapping("/purchases")
-	public @ResponseBody ResponseEntity<HttpStatus> createOne(@RequestBody PurchaseView view){
-		return service.createPurchase(view);
+	public @ResponseBody ResponseEntity<IdView> createOne(@RequestBody PurchaseView view){
+		IdView newView = new IdView(service.createPurchase(view));
+		return new ResponseEntity<IdView>(newView, HttpStatus.CREATED);
 	}
 	
 	@GetMapping("/purchases")
 	public @ResponseBody PurchaseView getOne(@RequestParam("id") long id) throws EntityNotFoundException {
 		return new PurchaseView(service.getPurchase(id));
+	}
+	
+	@GetMapping("/statistics")
+	public @ResponseBody ResponseEntity<StatisticsView> getStatistics(){
+		return new ResponseEntity<StatisticsView>(service.getStatistics(), HttpStatus.OK);
 	}
 }

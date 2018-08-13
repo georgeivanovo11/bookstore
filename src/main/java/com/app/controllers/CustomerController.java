@@ -36,4 +36,10 @@ public class CustomerController {
 		return customerViews;
 	}
 	
+	@PutMapping("/customer/money")
+	public @ResponseBody ResponseEntity<HttpStatus> updateOne(@RequestBody CustomerView view) throws EntityNotFoundException {
+		service.changeMoney(view.id, view.balance);
+		return new ResponseEntity<HttpStatus>(HttpStatus.OK);
+	}
+	
 }

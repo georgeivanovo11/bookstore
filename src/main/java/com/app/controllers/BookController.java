@@ -58,7 +58,12 @@ public class BookController {
 		DeliveryView view = objectMapper.readValue(str, DeliveryView.class);
 		int count = service.createDelivery(view);
 		String message = "Number of saved book is " + count;
-		return new ResponseEntity<String>(message,HttpStatus.CREATED);
+		if(count>0) {
+			return new ResponseEntity<String>(message,HttpStatus.CREATED);
+		}
+		else {
+			return new ResponseEntity<String>(message,HttpStatus.NOT_FOUND);
+		}
 	}
 	
 //	@PostMapping("/delivery")

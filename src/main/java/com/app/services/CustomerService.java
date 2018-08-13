@@ -37,4 +37,15 @@ public class CustomerService {
 		Iterable<Customer> customers = repository.findAll();
         return customers;
     }
+	
+	public void changeMoney(long id, double money) {
+		Optional<Customer> _customer = repository.findById(id);
+		if (!_customer.isPresent()) {
+			String message = "Customer with id: " + id + " doesn't exist!";
+            throw new EntityNotFoundException(message);
+        }
+        Customer customer = _customer.get();
+        customer.setBalance(money);
+        repository.save(customer);
+	}
 }
