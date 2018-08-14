@@ -39,20 +39,20 @@ public class PurchaseController {
 		return new ResponseEntity<PurchaseView>(pv, HttpStatus.CREATED);
 	}
 	
-	@PutMapping("/purchases/pay")
-	public @ResponseBody ResponseEntity<HttpStatus> payOne(@RequestParam("id") long id) throws EntityNotFoundException, PurchaseNotFoundException, PurchaseAlreadyPaidException, BookNotAvailableException, CustomerNotEnoughMoneyException{
+	@PutMapping("/purchases/{id}/pay")
+	public @ResponseBody ResponseEntity<HttpStatus> payOne(@PathVariable("id") long id) throws EntityNotFoundException, PurchaseNotFoundException, PurchaseAlreadyPaidException, BookNotAvailableException, CustomerNotEnoughMoneyException{
 		service.payPurchase(id);
 		return new ResponseEntity<HttpStatus>(HttpStatus.OK);
 	}
 	
-	@PutMapping("/purchases/cancel")
-	public @ResponseBody ResponseEntity<HttpStatus> cancelOne(@RequestParam("id") long id) throws EntityNotFoundException, StoreNotEnoughMoneyException, PurchaseAlreadyCanceledException, PurchaseNotFoundException{
+	@PutMapping("/purchases/{id}/cancel")
+	public @ResponseBody ResponseEntity<HttpStatus> cancelOne(@PathVariable("id") long id) throws EntityNotFoundException, StoreNotEnoughMoneyException, PurchaseAlreadyCanceledException, PurchaseNotFoundException{
 		service.cancelPurchase(id);
 		return new ResponseEntity<HttpStatus>(HttpStatus.OK);
 	}
 	
-	@GetMapping("/purchases")
-	public @ResponseBody PurchaseView getOne(@RequestParam("id") long id) throws EntityNotFoundException {
+	@GetMapping("/purchases/{id}")
+	public @ResponseBody PurchaseView getOne(@PathVariable("id") long id) throws EntityNotFoundException {
 		return new PurchaseView(service.getPurchase(id));
 	}
 	

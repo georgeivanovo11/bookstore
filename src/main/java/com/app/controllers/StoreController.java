@@ -33,12 +33,12 @@ public class StoreController {
 		return new ResponseEntity<StoreView>(savedStoreView, HttpStatus.CREATED);
 	}
 	
-	@GetMapping("/stores")
-	public @ResponseBody StoreView getOne(@RequestParam("id") long id) throws EntityNotFoundException {
+	@GetMapping("/stores/{id}")
+	public @ResponseBody StoreView getOne(@PathVariable("id") long id) throws EntityNotFoundException {
 		return new StoreView(service.getStore(id));
 	}
 	
-	@GetMapping("/stores/all")
+	@GetMapping("/stores")
 	public @ResponseBody List<StoreView> getAll() {
 		Iterable<Store> stores = service.getAllStores();
 		List<StoreView> storeViews = new ArrayList<StoreView>();

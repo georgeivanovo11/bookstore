@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import com.app.models.*;
 import com.app.repositories.*;
+import com.app.utilities.CustomerNotFoundException;
 
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.CREATED;
@@ -37,6 +38,14 @@ public class CustomerService {
 	public Iterable<Customer> getAllCustomers() {
 		Iterable<Customer> customers = repository.findAll();
         return customers;
+    }
+	
+	public Customer getCustomer(long id) throws CustomerNotFoundException {
+		Optional<Customer> _customer = repository.findById(id);
+		if (!_customer.isPresent()) {
+            throw new CustomerNotFoundException(id);
+        }
+        return _customer.get();
     }
 	
 	public void changeMoney(long id, double money) {

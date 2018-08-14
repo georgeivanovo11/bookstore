@@ -32,12 +32,12 @@ public class BookController {
 		return new ResponseEntity<BookView>(savedBookView, HttpStatus.CREATED);
 	}
 	
-	@GetMapping("/books")
-	public @ResponseBody BookView getOne(@RequestParam("id") long id) throws EntityNotFoundException {
+	@GetMapping("/books/{id}")
+	public @ResponseBody BookView getOne(@PathVariable("id") long id) throws EntityNotFoundException {
 		return new BookView(service.getBook(id));
 	}
 	
-	@GetMapping("/books/all")
+	@GetMapping("/books")
 	public @ResponseBody List<BookView> getAll() {
 		Iterable<Book> books = service.getAllBooks();
 		List<BookView> bookViews = new ArrayList<BookView>();
@@ -47,10 +47,6 @@ public class BookController {
 		return bookViews;
 	}
 	
-	@GetMapping("/books/all/amount")
-	public @ResponseBody List<BookViewWithAmount> getAllWithAmount() {
-		return service.getAllBooksWithAmount();
-	}
 	
 	@PostMapping("/delivery")
 	public @ResponseBody ResponseEntity<String> delivery(@RequestBody String str) throws JsonParseException, JsonMappingException, IOException{
@@ -65,6 +61,11 @@ public class BookController {
 			return new ResponseEntity<String>(message,HttpStatus.NOT_FOUND);
 		}
 	}
+	
+//	@GetMapping("/books/amount")
+//	public @ResponseBody List<BookViewWithAmount> getAllWithAmount() {
+//		return service.getAllBooksWithAmount();
+//	}
 	
 //	@PostMapping("/delivery")
 //	public @ResponseBody ResponseEntity<HttpStatus> delivery(@RequestBody String str) throws JsonParseException, JsonMappingException, IOException{
