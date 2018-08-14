@@ -51,14 +51,7 @@ public class CustomerController {
 		List<PurchaseView> purchaseViews = new ArrayList<PurchaseView>();
 		for (Purchase p : purchases) {
 			PurchaseView pv = new PurchaseView(p);
-			pv.books = new long [p.getPurchasebooks().size()];
-			i=0;
-			p.getPurchasebooks().forEach(item -> {
-				pv.books[i]=item.getBook().getId();
-				i++;
-			});
 			purchaseViews.add(pv);
-			
 		}
 		return purchaseViews;
 	}

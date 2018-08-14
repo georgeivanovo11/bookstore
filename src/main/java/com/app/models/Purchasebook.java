@@ -31,6 +31,12 @@ public class Purchasebook implements Serializable{
         this.purchase = purchase;
         this.amount = amount;
     }
+    
+    public Purchasebook(Book book, Purchase purchase) {
+        this.book = book;
+        this.purchase = purchase;
+        this.amount = 1;
+    }
 	
 	
 	public Book getBook() {

@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import com.app.models.*;
 import com.app.repositories.*;
+import com.app.utilities.*;
 import com.app.views.*;
 
 import static org.springframework.http.HttpStatus.NO_CONTENT;
@@ -24,8 +25,6 @@ import static org.springframework.http.HttpStatus.ACCEPTED;
 public class PurchaseService {
 	
 	long STORE_ID = 56;
-	double totalPayment = 0;
-	int i;
 	
 	@Autowired
     private CustomerRepository customerRepository;
@@ -51,114 +50,86 @@ public class PurchaseService {
         return purchase.get();
     }
 	
-	public long createPurchase(PurchaseView view) {
-		
-		//setup
-		boolean isError=false;
-		List<Long> notExistArray = new ArrayList<Long>();
-		List<Long> notEnoughItemsArray = new ArrayList<Long>();
-		boolean isEnoughMoney = true;
-		boolean isCustomerExists = true;
-		double totalPrice=0;
-		
-		//check		
+	public Purchase createPurchase(PurchaseView view) throws CustomerNotFoundException, BookNotFoundException, BookNotAvailableException, CustomerNotEnoughMoneyException, PurchaseNotFoundException {
+				
+		//----------------------------check---------------------------------------		
 		Optional<Customer> _customer = customerRepository.findById(view.customer_id);
 		if (!_customer.isPresent()) {
-			isCustomerExists = false;
+			throw new CustomerNotFoundException(view.customer_id);
         }
+		Customer customer = _customer.get();
 		
-		for(long item: view.books) {
-			Optional<Book> _book = bookRepository.findById(item);
+		List<Long> notAvailableList = new ArrayList<Long>();
+		double totalPayment = 0;
+		for(long id: view.books) {
+			Optional<Book> _book = bookRepository.findById(id);
 			if (!_book.isPresent()) {
-				notExistArray.add(item);
-				isError=true;
-				continue;
+				throw new BookNotFoundException(id);
 	        }
 			Book book = _book.get();
 			int amount = book.getWarehouse().getAmount();
 			if(amount<=0) {
-				notEnoughItemsArray.add(item);
-				isError=true;
-				continue;
+				notAvailableList.add(id);
 			}
-			totalPrice += book.getWarehouse().getPrice();
+			totalPayment += book.getWarehouse().getPrice();
 		}
 		
-		if(_customer.get().getBalance() - totalPrice <0 ) {
-			isEnoughMoney=false;
-			isError = true;
+		if(notAvailableList.size()>0) {
+			throw new BookNotAvailableException(notAvailableList);
 		}
 		
-		if(isError) {
-			if(!isCustomerExists) {
-	            throw new EntityNotFoundException("Wrong customer id");
-			}
-			if(!isEnoughMoney) {
-	            throw new EntityNotFoundException("Customer doesn't have enough money!");
-			}
-			if(notExistArray.size()!=0) {
-	            throw new EntityNotFoundException("Book with such id doesn't exist.");
-			}
-			if(notExistArray.size()!=0) {
-	            throw new EntityNotFoundException("Book with such id doesn't exist.");
-			}
-			if(notEnoughItemsArray.size()!=0) {
-	            throw new EntityNotFoundException("The book is not available now.");
-			}
+		if(customer.getBalance() - totalPayment < 0 ) {
+			throw new CustomerNotEnoughMoneyException(view.customer_id);
 		}
-		
-		
-		//act
-		Customer customer = _customer.get();
+	
+		//-----------------------------act-------------------------------------------
 		Purchase purchase = new Purchase("pending");
 		purchase.setCustomer(customer);
 		
-		for(long item: view.books) {
-			Optional<Book> _book = bookRepository.findById(item);
-			Book book = _book.get();
-			Purchasebook pb = new Purchasebook(book,purchase,1);
+		for(long id: view.books) {
+			Book book = bookRepository.findById(id).get();
+			Purchasebook pb = new Purchasebook(book,purchase);
 			book.getPurchasebooks().add(pb);
 			purchaseRepository.save(purchase);
 			bookRepository.save(book);	
 		}
-		purchase.setTotalPayment(totalPrice);
+		purchase.setTotalPayment(totalPayment);
 		Purchase saved = purchaseRepository.save(purchase);
-		return saved.getId();
+		
+		return saved;
     }
 	
-	public void payPurchase(long id) throws EntityNotFoundException {
+	public void payPurchase(long id) throws PurchaseNotFoundException, PurchaseAlreadyPaidException, BookNotAvailableException, CustomerNotEnoughMoneyException {
 		Optional<Purchase> _purchase = purchaseRepository.findById(id);
 		if (!_purchase.isPresent()) {
-			String message = "Purchase with id: " + id + " doesn't exist!";
-            throw new EntityNotFoundException(message);
+            throw new PurchaseNotFoundException(id);
         }
 		Purchase purchase = _purchase.get();
-//		if (purchase.getStatus().equals("paid")) {
-//			String message = "The purchase has already paid!";
-//            throw new EntityNotFoundException(message);
-//        }
+		Customer customer = purchase.getCustomer();
 		
-		//setup
-		boolean isError=false;
-		List<Long> notExistArray = new ArrayList<Long>();
-		List<Long> notEnoughItemsArray = new ArrayList<Long>();
-		boolean isEnoughMoney = true;
-		boolean isCustomerExists = true;
+		//---------------------------------check--------------------------
+		if (purchase.getStatus().equals("paid")) {
+            throw new PurchaseAlreadyPaidException();
+        }
 		
-		//check		
-		totalPayment = 0;
-		purchase.getPurchasebooks().forEach(item ->{
-			if(item.getBook().getWarehouse().getAmount()==0) {
-				throw new EntityNotFoundException("not available");
+		List<Long> notAvailableList = new ArrayList<Long>();
+		double totalPayment = 0;
+		for(Purchasebook pb: purchase.getPurchasebooks()) {
+			if(pb.getBook().getWarehouse().getAmount()<=0) {
+				notAvailableList.add(id);
 			}
-			totalPayment+=item.getBook().getWarehouse().getPrice();
-		});
-		
-		if(purchase.getCustomer().getBalance() - totalPayment <0 ) {
-			throw new EntityNotFoundException("not enough money");
+			totalPayment += pb.getBook().getWarehouse().getPrice();
 		}
 		
-		//act
+		if(notAvailableList.size()>0) {
+			throw new BookNotAvailableException(notAvailableList);
+		}
+		
+		if(customer.getBalance() - totalPayment < 0 ) {
+			throw new CustomerNotEnoughMoneyException(customer.getId());
+		}
+		
+		//------------------------act--------------------------------
 		purchase.getPurchasebooks().forEach(item ->{
 			Warehouse wh = item.getBook().getWarehouse();
 			int oldAmount = wh.getAmount();
@@ -169,48 +140,49 @@ public class PurchaseService {
 		purchase.setStatus("paid");
 		Purchase saved = purchaseRepository.save(purchase);
 
-		Customer customer = purchase.getCustomer();
 		customer.setBalance(customer.getBalance() - totalPayment);
 		customerRepository.save(customer);
 		
 		Optional<Store> _store = storeRepository.findById(STORE_ID);
 		if(_store.isPresent()) {
-			System.out.println("here");
 			Store store = _store.get();
 			store.setBalance(store.getBalance() + totalPayment);
 			storeRepository.save(store);
 		}
 	}
 	
-	public void cancelPurchase(long id) throws EntityNotFoundException {
+	public void cancelPurchase(long id) throws StoreNotEnoughMoneyException, PurchaseAlreadyCanceledException, PurchaseNotFoundException  {
 		Optional<Purchase> _purchase = purchaseRepository.findById(id);
 		if (!_purchase.isPresent()) {
-			String message = "Purchase with id: " + id + " doesn't exist!";
-            throw new EntityNotFoundException(message);
+            throw new PurchaseNotFoundException(id);
         }
 		Purchase purchase = _purchase.get();
+		Customer customer = purchase.getCustomer();
+		
 		if (purchase.getStatus().equals("cancel")) {
-			String message = "The purchase has already canceled!";
-            throw new EntityNotFoundException(message);
+            throw new PurchaseAlreadyCanceledException();
         }
-		totalPayment = 0;
-		purchase.getPurchasebooks().forEach(item ->{
-			Warehouse wh = item.getBook().getWarehouse();
+		
+		double totalPayment = 0;
+		for(Purchasebook pb: purchase.getPurchasebooks()) {
+			Warehouse wh = pb.getBook().getWarehouse();
 			int oldAmount = wh.getAmount();
 			totalPayment += wh.getPrice();
 			wh.setAmount(++oldAmount);
 			warehouseRepository.save(wh);
-		});
+		}
+
 		Optional<Store> _store = storeRepository.findById(STORE_ID);
 		if(_store.isPresent()) {
 			Store store = _store.get();
+			if(store.getBalance() - totalPayment <= 0 ) {
+	            throw new StoreNotEnoughMoneyException(STORE_ID);
+			}
 			store.setBalance(store.getBalance() - totalPayment);
 			storeRepository.save(store);
 		}
 		
-		Customer customer= purchase.getCustomer();
 		customer.setBalance(customer.getBalance() + totalPayment);
-		
 		purchase.setStatus("cancel");
 		purchaseRepository.save(purchase);
 	}
@@ -255,17 +227,7 @@ public class PurchaseService {
 		List<Purchase> purchases = purchaseRepository.findAll();
 		List<PurchaseView> purchaseViews = new ArrayList<PurchaseView>();
 		for(Purchase p: purchases) {
-			PurchaseView pv = new PurchaseView();
-			pv.id = p.getId();
-			pv.status = p.getStatus();
-			pv.customer_id = p.getCustomer().getId();
-			pv.totalPayment = p.getTotalPayment();
-			pv.books = new long [p.getPurchasebooks().size()];
-			i=0;
-			p.getPurchasebooks().forEach(item -> {
-				pv.books[i]=item.getBook().getId();
-				i++;
-			});
+			PurchaseView pv = new PurchaseView(p);
 			purchaseViews.add(pv);
 		}
 		view.purchases = purchaseViews;

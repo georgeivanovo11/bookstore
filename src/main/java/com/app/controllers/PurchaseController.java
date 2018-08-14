@@ -14,6 +14,14 @@ import org.springframework.web.bind.annotation.*;
 import com.app.models.*;
 import com.app.repositories.StoreRepository;
 import com.app.services.*;
+import com.app.utilities.BookNotAvailableException;
+import com.app.utilities.BookNotFoundException;
+import com.app.utilities.CustomerNotFoundException;
+import com.app.utilities.PurchaseAlreadyCanceledException;
+import com.app.utilities.PurchaseAlreadyPaidException;
+import com.app.utilities.CustomerNotEnoughMoneyException;
+import com.app.utilities.PurchaseNotFoundException;
+import com.app.utilities.StoreNotEnoughMoneyException;
 import com.app.views.*;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -26,19 +34,19 @@ public class PurchaseController {
 	private PurchaseService service;
 
 	@PostMapping("/purchases")
-	public @ResponseBody ResponseEntity<IdView> createOne(@RequestBody PurchaseView view){
-		IdView newView = new IdView(service.createPurchase(view));
-		return new ResponseEntity<IdView>(newView, HttpStatus.CREATED);
+	public @ResponseBody ResponseEntity<PurchaseView> createOne(@RequestBody PurchaseView view) throws CustomerNotFoundException, BookNotFoundException, BookNotAvailableException, CustomerNotEnoughMoneyException, PurchaseNotFoundException{
+		PurchaseView pv = new PurchaseView(service.createPurchase(view));
+		return new ResponseEntity<PurchaseView>(pv, HttpStatus.CREATED);
 	}
 	
 	@PutMapping("/purchases/pay")
-	public @ResponseBody ResponseEntity<HttpStatus> payOne(@RequestParam("id") long id) throws EntityNotFoundException{
+	public @ResponseBody ResponseEntity<HttpStatus> payOne(@RequestParam("id") long id) throws EntityNotFoundException, PurchaseNotFoundException, PurchaseAlreadyPaidException, BookNotAvailableException, CustomerNotEnoughMoneyException{
 		service.payPurchase(id);
 		return new ResponseEntity<HttpStatus>(HttpStatus.OK);
 	}
 	
 	@PutMapping("/purchases/cancel")
-	public @ResponseBody ResponseEntity<HttpStatus> cancelOne(@RequestParam("id") long id) throws EntityNotFoundException{
+	public @ResponseBody ResponseEntity<HttpStatus> cancelOne(@RequestParam("id") long id) throws EntityNotFoundException, StoreNotEnoughMoneyException, PurchaseAlreadyCanceledException, PurchaseNotFoundException{
 		service.cancelPurchase(id);
 		return new ResponseEntity<HttpStatus>(HttpStatus.OK);
 	}

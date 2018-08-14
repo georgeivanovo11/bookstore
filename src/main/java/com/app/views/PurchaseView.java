@@ -13,9 +13,15 @@ public class PurchaseView {
 	}
 	
 	public PurchaseView(Purchase purchase){
+		this.id = purchase.getId();
 		this.status = purchase.getStatus();
 		this.totalPayment = purchase.getTotalPayment();
 		this.customer_id = purchase.getCustomer().getId();
-		
+		this.books = new long [purchase.getPurchasebooks().size()];
+		int index = 0;
+		for(Purchasebook pb: purchase.getPurchasebooks()) {
+			this.books[index]=pb.getBook().getId();
+			index++;
+		}
 	}
 }
