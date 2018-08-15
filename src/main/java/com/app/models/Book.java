@@ -5,6 +5,12 @@ import java.util.Set;
 
 import javax.persistence.*;
 
+import org.hibernate.HibernateException;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.id.IdentityGenerator;
+
+import com.app.utilities.*;
 import com.app.views.*;
 import com.app.models.*;
 
@@ -29,19 +35,25 @@ public class Book {
         purchasebooks = new HashSet<>();
 	}
 	
-	public Book(String title, String author) {
+	public Book(long id, String title, String author) {
+		this.id = id;
 		this.title = title;
 		this.author = author;
 	}
 	
 	public Book(BookView view) {
+		this.id = view.id;
 		this.title = view.title;
 		this.author = view.author;
 	}
 	
 	@Id
-	@Column(name = "book_id")
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@Basic(optional = false)
+	@GeneratedValue(strategy=GenerationType.IDENTITY, generator="IdOrGenerated")
+	@GenericGenerator(name="IdOrGenerated",
+	                  strategy="com.app.utilities.UseIdOrGenerate"
+	)
+	@Column(name = "book_id",nullable = false)
 	public long getId() {
         return this.id;
     }
@@ -85,4 +97,7 @@ public class Book {
     public void setPurchasebooks(Set<Purchasebook> purchasebooks) {
         this.purchasebooks = purchasebooks;
     }
+   
 }
+
+

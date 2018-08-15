@@ -19,4 +19,11 @@ public class BookView {
 	    this.title = book.getTitle();
 	    this.author = book.getAuthor();
 	}
+	
+	public BookView(long id, String title, String author){
+	    this.id = id;
+	    this.title = title;
+	    this.author = author;
+	}
 }
+

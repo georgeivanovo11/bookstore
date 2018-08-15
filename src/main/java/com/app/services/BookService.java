@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import com.app.models.*;
 import com.app.repositories.*;
+import com.app.utilities.EntityAlreadyExistsException;
 import com.app.views.*;
 
 import static org.springframework.http.HttpStatus.NO_CONTENT;
@@ -30,10 +31,12 @@ public class BookService {
 	@Autowired
 	private WarehouseRepository wRepository;
 	
-	public Book createBook(Book book) {
-		if(repository.existsById(book.getId())) {
-			book.setId(0);
+	public Book createBook(BookView view) throws EntityAlreadyExistsException {
+		if(repository.existsById(view.id)) {
+			throw new EntityAlreadyExistsException("book", view.id);
 		}
+		Book book = new Book(view.id, view.title, view.author);
+		//System.out.println(book.getId());
         return repository.save(book);
     }
 	
@@ -89,6 +92,10 @@ public class BookService {
 		}
 		return numberOfSavedBook;
     }
+	
+	public void deleteAllBooks() {
+		repository.deleteAll();
+	}
 	
 //	public ResponseEntity<HttpStatus> deleteBook(Long id) throws EntityNotFoundException {
 //		Optional<Book> book = repository.findById(id);

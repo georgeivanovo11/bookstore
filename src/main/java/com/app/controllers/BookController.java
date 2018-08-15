@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.app.models.*;
 import com.app.services.*;
+import com.app.utilities.EntityAlreadyExistsException;
 import com.app.views.*;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -25,9 +26,8 @@ public class BookController {
 	private BookService service;
 
 	@PostMapping("/books")
-	public @ResponseBody ResponseEntity<BookView> createOne(@RequestBody BookView view){
-		Book receivedBook = new Book(view);
-		Book savedBook = service.createBook(receivedBook);
+	public @ResponseBody ResponseEntity<BookView> createOne(@RequestBody BookView view) throws EntityAlreadyExistsException{
+		Book savedBook = service.createBook(view);
 		BookView savedBookView = new BookView(savedBook);
 		return new ResponseEntity<BookView>(savedBookView, HttpStatus.CREATED);
 	}
@@ -49,16 +49,16 @@ public class BookController {
 	
 	
 	@PostMapping("/delivery")
-	public @ResponseBody ResponseEntity<String> delivery(@RequestBody String str) throws JsonParseException, JsonMappingException, IOException{
+	public @ResponseBody ResponseEntity<DeliveryOutView> delivery(@RequestBody String str) throws JsonParseException, JsonMappingException, IOException{
 		ObjectMapper objectMapper = new ObjectMapper();
 		DeliveryView view = objectMapper.readValue(str, DeliveryView.class);
 		int count = service.createDelivery(view);
-		String message = "Number of saved book is " + count;
+		DeliveryOutView dov = new DeliveryOutView(count);
 		if(count>0) {
-			return new ResponseEntity<String>(message,HttpStatus.CREATED);
+			return new ResponseEntity<DeliveryOutView>(dov, HttpStatus.ACCEPTED);
 		}
 		else {
-			return new ResponseEntity<String>(message,HttpStatus.NOT_FOUND);
+			return new ResponseEntity<DeliveryOutView>(dov, HttpStatus.CONFLICT);
 		}
 	}
 	
