@@ -51,8 +51,7 @@ public class Book {
 	@Basic(optional = false)
 	@GeneratedValue(strategy=GenerationType.IDENTITY, generator="IdOrGenerated")
 	@GenericGenerator(name="IdOrGenerated",
-	                  strategy="com.app.utilities.UseIdOrGenerate"
-	)
+	                  strategy="com.app.utilities.UseIdOrGenerate")
 	@Column(name = "book_id",nullable = false)
 	public long getId() {
         return this.id;

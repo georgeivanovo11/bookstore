@@ -11,8 +11,6 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
-import javax.persistence.EntityNotFoundException;
-
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @ControllerAdvice
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
@@ -25,9 +23,9 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     }
 	
 	@ExceptionHandler(EntityNotFoundException.class)
-    protected ResponseEntity<Object> handleEntityNotFound(EntityNotFoundException ex)
+    protected ResponseEntity<Object> handleEntityNotFoundException(EntityNotFoundException ex)
 	{
-        ApiError apiError = new ApiError(NOT_FOUND, ex.getMessage());
+        ApiError apiError = new ApiError(HttpStatus.NOT_FOUND, ex.getMessage());
         return new ResponseEntity<>(apiError, apiError.status);
     }
 	

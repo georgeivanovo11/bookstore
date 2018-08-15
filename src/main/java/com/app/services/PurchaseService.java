@@ -233,6 +233,10 @@ public class PurchaseService {
 		view.purchases = purchaseViews;
 		return view;
 	}
+	
+	public void deleteAllPurchases(){
+		this.purchaseRepository.deleteAll();
+	}
 
 }
 

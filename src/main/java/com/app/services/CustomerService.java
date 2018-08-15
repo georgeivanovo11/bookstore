@@ -3,8 +3,6 @@ package com.app.services;
 import java.util.List;
 import java.util.Optional;
 
-import javax.persistence.EntityNotFoundException;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +11,9 @@ import org.springframework.stereotype.Service;
 import com.app.models.*;
 import com.app.repositories.*;
 import com.app.utilities.CustomerNotFoundException;
+import com.app.utilities.EntityAlreadyExistsException;
+import com.app.utilities.EntityNotFoundException;
+import com.app.views.*;
 
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.CREATED;
@@ -26,46 +27,47 @@ public class CustomerService {
 	@Autowired
     private CustomerRepository repository;
 	
-	public ResponseEntity<HttpStatus> createCustomer(Customer customer) {
-		if(repository.existsById(customer.getId())) {
-			customer.setId(0);
+	public Customer createCustomer(CustomerView view) throws EntityAlreadyExistsException {
+		if(repository.existsById(view.id)) {
+			throw new EntityAlreadyExistsException("customer", view.id);
 		}
-        repository.save(customer);
-        return new ResponseEntity<>(CREATED);
-
+		Customer customer = new Customer(view.id,view.name,view.balance);
+        return repository.save(customer);
     }
 	
-	public Iterable<Customer> getAllCustomers() {
-		Iterable<Customer> customers = repository.findAll();
-        return customers;
-    }
-	
-	public Customer getCustomer(long id) throws CustomerNotFoundException {
+	public Customer getCustomer(long id) throws EntityNotFoundException  {
 		Optional<Customer> _customer = repository.findById(id);
 		if (!_customer.isPresent()) {
-            throw new CustomerNotFoundException(id);
+            throw new EntityNotFoundException("customer",id);
         }
         return _customer.get();
     }
 	
-	public void changeMoney(long id, double money) {
+	public List<Customer> getAllCustomers() {
+		List<Customer> customers = repository.findAll();
+        return customers;
+    }
+	
+	public void changeMoney(long id, double money) throws EntityNotFoundException {
 		Optional<Customer> _customer = repository.findById(id);
 		if (!_customer.isPresent()) {
-			String message = "Customer with id: " + id + " doesn't exist!";
-            throw new EntityNotFoundException(message);
+            throw new EntityNotFoundException("customer",id);
         }
         Customer customer = _customer.get();
         customer.setBalance(money);
         repository.save(customer);
 	}
 	
-	public List<Purchase> getPurchases(long id){
+	public List<Purchase> getPurchasesOfTheCustomer(long id) throws EntityNotFoundException{
 		Optional<Customer> _customer = repository.findById(id);
 		if (!_customer.isPresent()) {
-			String message = "Book with id: " + id + " doesn't exist!";
-            throw new EntityNotFoundException(message);
+            throw new EntityNotFoundException("book", id);
         }
         Customer customer = _customer.get();
         return customer.getPurchases();
+	}
+	
+	public void deleteAllCustomers(){
+		this.repository.deleteAll();
 	}
 }

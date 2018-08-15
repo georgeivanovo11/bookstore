@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import javax.persistence.EntityNotFoundException;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,7 +11,7 @@ import org.springframework.stereotype.Service;
 
 import com.app.models.*;
 import com.app.repositories.*;
-import com.app.utilities.EntityAlreadyExistsException;
+import com.app.utilities.*;
 import com.app.views.*;
 
 import static org.springframework.http.HttpStatus.NO_CONTENT;
@@ -36,15 +34,13 @@ public class BookService {
 			throw new EntityAlreadyExistsException("book", view.id);
 		}
 		Book book = new Book(view.id, view.title, view.author);
-		//System.out.println(book.getId());
         return repository.save(book);
     }
 	
 	public Book getBook(Long id) throws EntityNotFoundException {
 		Optional<Book> book = repository.findById(id);
 		if (!book.isPresent()) {
-			String message = "Book with id: " + id + " doesn't exist!";
-            throw new EntityNotFoundException(message);
+            throw new EntityNotFoundException("book",id);
         }
         return book.get();
     }

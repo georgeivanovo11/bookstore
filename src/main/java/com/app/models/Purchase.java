@@ -49,6 +49,13 @@ public class Purchase  {
         purchasebooks = new HashSet<>();
 	}
 	
+	public Purchase(String status, double totalPayment, Customer customer) {
+		this.status = status;
+		this.totalPayment = totalPayment;
+		this.customer = customer;
+        purchasebooks = new HashSet<>();
+	}
+	
 	
 	public long getId() {
         return this.id;

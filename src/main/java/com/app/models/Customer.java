@@ -3,6 +3,7 @@ package com.app.models;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -12,15 +13,20 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.GenericGenerator;
+
 import com.app.views.*;
 
 @Entity
 @Table(name = "customer")
 public class Customer  {
-	
+		
 	@Id
-	@Column(name = "customer_id")
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@Basic(optional = false)
+	@GeneratedValue(strategy=GenerationType.IDENTITY, generator="IdOrGenerated")
+	@GenericGenerator(name="IdOrGenerated",
+	                  strategy="com.app.utilities.UseIdOrGenerate")
+	@Column(name = "customer_id",nullable = false)
 	private long id;
 	
 	@Column(name = "name")
@@ -39,7 +45,8 @@ public class Customer  {
 	public Customer()
 	{}
 	
-	public Customer(String name, double balance) {
+	public Customer(long id, String name, double balance) {
+		this.id = id;
 		this.name = name;
 		this.balance = balance;
 		this.purchases = new ArrayList<>();

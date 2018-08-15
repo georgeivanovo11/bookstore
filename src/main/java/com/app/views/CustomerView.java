@@ -13,6 +13,12 @@ public class CustomerView {
 		this.balance = 0;
 	}
 	
+	public CustomerView(long id, String name, double balance){
+		this.id = id;
+		this.name = name;
+		this.balance = balance;
+	}
+	
 	public CustomerView(Customer customer){
 	    this.id = customer.getId();
 	    this.name = customer.getName();
