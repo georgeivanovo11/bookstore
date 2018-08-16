@@ -187,53 +187,6 @@ public class PurchaseService {
 		purchaseRepository.save(purchase);
 	}
 	
-	public StatisticsView getStatistics() {
-		StatisticsView view = new StatisticsView();
-		Optional<Store> _store = storeRepository.findById(STORE_ID);
-		if(_store.isPresent()) {
-			view.store =  new StoreView(_store.get());
-		}
-		List<Book> books = bookRepository.findAll();
-		List<BookViewWithAmount> bookViews = new ArrayList<BookViewWithAmount>();
-		for(Book book: books) {
-			BookViewWithAmount bview = new BookViewWithAmount();
-			bview.id = book.getId();
-			bview.title = book.getTitle();
-			if(book.getWarehouse()!=null) {
-				bview.amount = book.getWarehouse().getAmount();
-			}
-			else {
-				bview.amount=0;
-			}
-			if(book.getWarehouse()!=null) {
-				bview.price = book.getWarehouse().getPrice();
-			}
-			else {
-				bview.price=0;
-			}
-			bookViews.add(bview);
-		}
-		view.books = bookViews;
-		List<Customer> customers = customerRepository.findAll();
-		List<CustomerView> customerViews = new ArrayList<CustomerView>();
-		for(Customer c: customers) {
-			CustomerView cv = new CustomerView();
-			cv.id = c.getId();
-			cv.name = c.getName();
-			cv.balance = c.getBalance();
-			customerViews.add(cv);
-		}
-		view.customers = customerViews;
-		List<Purchase> purchases = purchaseRepository.findAll();
-		List<PurchaseView> purchaseViews = new ArrayList<PurchaseView>();
-		for(Purchase p: purchases) {
-			PurchaseView pv = new PurchaseView(p);
-			purchaseViews.add(pv);
-		}
-		view.purchases = purchaseViews;
-		return view;
-	}
-	
 	public void deleteAllPurchases(){
 		this.purchaseRepository.deleteAll();
 	}

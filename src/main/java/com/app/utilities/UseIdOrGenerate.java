@@ -12,7 +12,7 @@ public class UseIdOrGenerate extends IdentityGenerator {
 	 @Override
     public Serializable generate(SharedSessionContractImplementor session, Object object) throws HibernateException {
         Serializable id = session.getEntityPersister(null, object).getClassMetadata().getIdentifier(object, session);
-        if( id.toString().equals("0") || id == null) {
+        if(id == null) {
         	return super.generate(session, object);
         }
         else { 

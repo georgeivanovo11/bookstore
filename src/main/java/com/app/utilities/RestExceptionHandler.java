@@ -29,6 +29,14 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(apiError, apiError.status);
     }
 	
+	@ExceptionHandler(InvalidInputDataException.class)
+    protected ResponseEntity<Object> handleInvalidInputDataException(InvalidInputDataException ex)
+	{
+        ApiError apiError = new ApiError(HttpStatus.CONFLICT, ex.getMessage());
+        return new ResponseEntity<>(apiError, apiError.status);
+    }
+	
+	//////////////////////////////////////////////////////
 	@ExceptionHandler(CustomerNotFoundException.class)
     protected ResponseEntity<Object> handleCustomerNotFoundException(CustomerNotFoundException ex)
 	{

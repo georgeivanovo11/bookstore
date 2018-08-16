@@ -4,14 +4,11 @@ import com.app.models.*;
 
 public class BookView {
 
-	public long id;
+	public Long id;
 	public String title;
 	public String author;
 	
 	public BookView(){
-		this.id = 0;
-		this.title = "";
-		this.author = "";
 	}
 	
 	public BookView(Book book){
@@ -20,7 +17,7 @@ public class BookView {
 	    this.author = book.getAuthor();
 	}
 	
-	public BookView(long id, String title, String author){
+	public BookView(Long id, String title, String author){
 	    this.id = id;
 	    this.title = title;
 	    this.author = author;

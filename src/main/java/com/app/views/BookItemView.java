@@ -1,15 +1,15 @@
 package com.app.views;
 
 public class BookItemView {
-	public long id;
-	public double price;
-	public int amount;
+	public Long id;
+	public Double price;
+	public Integer amount;
 	
 	public BookItemView() {
 		
 	}
 	
-	public BookItemView(long id, int amount, double price) {
+	public BookItemView(Long id, Integer amount, Double price) {
 		this.id = id;
 		this.amount = amount;
 		this.price = price;

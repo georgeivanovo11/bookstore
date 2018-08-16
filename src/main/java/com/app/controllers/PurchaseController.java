@@ -56,8 +56,4 @@ public class PurchaseController {
 		return new PurchaseView(service.getPurchase(id));
 	}
 	
-	@GetMapping("/statistics")
-	public @ResponseBody ResponseEntity<StatisticsView> getStatistics(){
-		return new ResponseEntity<StatisticsView>(service.getStatistics(), HttpStatus.OK);
-	}
 }

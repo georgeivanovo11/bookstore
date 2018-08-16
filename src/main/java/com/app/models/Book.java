@@ -19,7 +19,7 @@ import com.app.models.*;
 @Table(name = "book")
 public class Book {
 	
-	private long id;
+	private Long id;
     private String title;
 	private String author;
     private Warehouse warehouse;
@@ -35,7 +35,7 @@ public class Book {
         purchasebooks = new HashSet<>();
 	}
 	
-	public Book(long id, String title, String author) {
+	public Book(Long id, String title, String author) {
 		this.id = id;
 		this.title = title;
 		this.author = author;
@@ -53,11 +53,11 @@ public class Book {
 	@GenericGenerator(name="IdOrGenerated",
 	                  strategy="com.app.utilities.UseIdOrGenerate")
 	@Column(name = "book_id",nullable = false)
-	public long getId() {
+	public Long getId() {
         return this.id;
     }
 	
-	public void setId(long id){
+	public void setId(Long id){
 		this.id = id;
 	}
 	

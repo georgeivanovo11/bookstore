@@ -4,8 +4,11 @@ import com.app.models.*;
 
 public class BookViewWithAmount {
 
-	public long id;
+	public Long id;
 	public String title;
-	public int amount;
-	public double price;
+	public Integer amount;
+	public Double price;
+	
+	public BookViewWithAmount(){}
+	
 }
