@@ -27,13 +27,13 @@ public class Customer  {
 	@GenericGenerator(name="IdOrGenerated",
 	                  strategy="com.app.utilities.UseIdOrGenerate")
 	@Column(name = "customer_id",nullable = false)
-	private long id;
+	private Long id;
 	
 	@Column(name = "name")
 	private String name;
 	
 	@Column(name = "balance")
-	private double balance;
+	private Double balance;
 	
 	@OneToMany(
 	        mappedBy = "customer", 
@@ -45,7 +45,7 @@ public class Customer  {
 	public Customer()
 	{}
 	
-	public Customer(long id, String name, double balance) {
+	public Customer(Long id, String name, Double balance) {
 		this.id = id;
 		this.name = name;
 		this.balance = balance;
@@ -60,11 +60,11 @@ public class Customer  {
 	}
 	
 	
-	public long getId() {
+	public Long getId() {
         return this.id;
     }
 	
-	public void setId(long id){
+	public void setId(Long id){
 		this.id = id;
 	}
 	
@@ -86,11 +86,11 @@ public class Customer  {
 	}
 	
 	
-	public double getBalance(){
+	public Double getBalance(){
         return this.balance;
     }
 	
-	public void setBalance(double balance){
+	public void setBalance(Double balance){
 		this.balance = balance;
 	}
 	

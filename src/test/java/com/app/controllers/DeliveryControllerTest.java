@@ -21,7 +21,6 @@ import com.app.views.*;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.app.models.Book;
 import com.app.services.BookService;
 import com.app.services.WarehouseService;
 import com.app.utilities.EntityAlreadyExistsException;
@@ -46,8 +45,8 @@ public class DeliveryControllerTest {
 	public void setUpClass() throws EntityAlreadyExistsException, InvalidInputDataException {
 	   wService.deleteAllLines();
 	   bService.deleteAllBooks();
-	   Book b1 = bService.createBook(new BookView( 1L,"title1", "author1"));
-	   Book b2 = bService.createBook(new BookView( 2L,"title2", "author2"));
+	   bService.createBook(new BookView( 1L,"title1", "author1"));
+	   bService.createBook(new BookView( 2L,"title2", "author2"));
 	}
     
 	@Test

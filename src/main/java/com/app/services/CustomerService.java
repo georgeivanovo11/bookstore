@@ -10,9 +10,9 @@ import org.springframework.stereotype.Service;
 
 import com.app.models.*;
 import com.app.repositories.*;
-import com.app.utilities.CustomerNotFoundException;
 import com.app.utilities.EntityAlreadyExistsException;
 import com.app.utilities.EntityNotFoundException;
+import com.app.utilities.InvalidInputDataException;
 import com.app.views.*;
 
 import static org.springframework.http.HttpStatus.NO_CONTENT;
@@ -27,20 +27,29 @@ public class CustomerService {
 	@Autowired
     private CustomerRepository repository;
 	
-	public Customer createCustomer(CustomerView view) throws EntityAlreadyExistsException {
-		if(repository.existsById(view.id)) {
+	public Customer createCustomer(CustomerView view) throws EntityAlreadyExistsException, InvalidInputDataException {
+		if(view.name == null) {
+			throw new InvalidInputDataException("name");
+		}
+		if(view.balance == null) {
+			throw new InvalidInputDataException("balance");
+		}
+		if(view.id != null && repository.existsById(view.id)) {
 			throw new EntityAlreadyExistsException("customer", view.id);
 		}
 		Customer customer = new Customer(view.id,view.name,view.balance);
         return repository.save(customer);
     }
 	
-	public Customer getCustomer(long id) throws EntityNotFoundException  {
-		Optional<Customer> _customer = repository.findById(id);
-		if (!_customer.isPresent()) {
+	public Customer getCustomer(Long id) throws EntityNotFoundException, InvalidInputDataException  {
+		if(id == null) {
+			throw new InvalidInputDataException("id");
+		}
+		Optional<Customer> customer = repository.findById(id);
+		if (!customer.isPresent()) {
             throw new EntityNotFoundException("customer",id);
         }
-        return _customer.get();
+        return customer.get();
     }
 	
 	public List<Customer> getAllCustomers() {
@@ -48,7 +57,13 @@ public class CustomerService {
         return customers;
     }
 	
-	public void changeMoney(long id, double money) throws EntityNotFoundException {
+	public void changeMoney(Long id, Double money) throws EntityNotFoundException, InvalidInputDataException {
+		if(id == null) {
+			throw new InvalidInputDataException("id");
+		}
+		if(money == null) {
+			throw new InvalidInputDataException("balance");
+		}
 		Optional<Customer> _customer = repository.findById(id);
 		if (!_customer.isPresent()) {
             throw new EntityNotFoundException("customer",id);
@@ -58,7 +73,10 @@ public class CustomerService {
         repository.save(customer);
 	}
 	
-	public List<Purchase> getPurchasesOfTheCustomer(long id) throws EntityNotFoundException{
+	public List<Purchase> getPurchasesOfTheCustomer(Long id) throws EntityNotFoundException, InvalidInputDataException{
+		if(id == null) {
+			throw new InvalidInputDataException("id");
+		}
 		Optional<Customer> _customer = repository.findById(id);
 		if (!_customer.isPresent()) {
             throw new EntityNotFoundException("book", id);

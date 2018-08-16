@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.EntityNotFoundException;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +12,9 @@ import org.springframework.web.bind.annotation.*;
 import com.app.models.*;
 import com.app.repositories.StoreRepository;
 import com.app.services.*;
+import com.app.utilities.EntityAlreadyExistsException;
+import com.app.utilities.EntityNotFoundException;
+import com.app.utilities.InvalidInputDataException;
 import com.app.views.*;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -26,35 +27,27 @@ public class StoreController {
 	private StoreService service;
 
 	@PostMapping("/stores")
-	public @ResponseBody ResponseEntity<StoreView> createOne(@RequestBody StoreView view){
-		Store receivedStore = new Store(view);
-		Store savedStore = service.createStore(receivedStore);
+	public @ResponseBody ResponseEntity<StoreView> createOne(@RequestBody StoreView view) throws InvalidInputDataException, EntityAlreadyExistsException{
+		Store savedStore = service.createStore(view);
 		StoreView savedStoreView = new StoreView(savedStore);
 		return new ResponseEntity<StoreView>(savedStoreView, HttpStatus.CREATED);
 	}
 	
 	@GetMapping("/stores/{id}")
-	public @ResponseBody StoreView getOne(@PathVariable("id") long id) throws EntityNotFoundException {
-		return new StoreView(service.getStore(id));
+	public @ResponseBody ResponseEntity<StoreView> getOne(@PathVariable("id") long id) throws EntityNotFoundException, InvalidInputDataException {
+		StoreView sv = new StoreView(service.getStore(id));
+		return new ResponseEntity<StoreView>(sv, HttpStatus.OK);
+
 	}
 	
 	@GetMapping("/stores")
-	public @ResponseBody List<StoreView> getAll() {
+	public @ResponseBody ResponseEntity<List<StoreView>> getAll() {
 		Iterable<Store> stores = service.getAllStores();
 		List<StoreView> storeViews = new ArrayList<StoreView>();
 		for (Store store : stores) {
 		    storeViews.add(new StoreView(store));
 		}
-		return storeViews;
+		return new ResponseEntity<List<StoreView>>(storeViews, HttpStatus.OK);
+
 	}
-	
-//	@DeleteMapping("/stores")
-//	public @ResponseBody ResponseEntity<HttpStatus> deleteOne(@RequestParam("id") long id) throws EntityNotFoundException {
-//		return service.deleteStore(id);
-//	}
-//	
-//	@PutMapping("/stores")
-//	public @ResponseBody ResponseEntity<HttpStatus> updateOne(@RequestBody Store store) throws EntityNotFoundException {
-//		return service.updateStore(store);
-//	}
 }

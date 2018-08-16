@@ -36,30 +36,10 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(apiError, apiError.status);
     }
 	
-	//////////////////////////////////////////////////////
-	@ExceptionHandler(CustomerNotFoundException.class)
-    protected ResponseEntity<Object> handleCustomerNotFoundException(CustomerNotFoundException ex)
-	{
-        ApiError apiError = new ApiError(NOT_FOUND, ex.getMessage());
-        return new ResponseEntity<>(apiError, apiError.status);
-    }
-	
-	@ExceptionHandler(BookNotFoundException.class)
-    protected ResponseEntity<Object> handleBookNotFoundException(BookNotFoundException ex)
-	{
-        ApiError apiError = new ApiError(NOT_FOUND, ex.getMessage());
-        return new ResponseEntity<>(apiError, apiError.status);
-    }
+	/////////////////////////////////////////////////////
 	
 	@ExceptionHandler(PurchaseNotFoundException.class)
     protected ResponseEntity<Object> handlePurchaseNotFoundException(PurchaseNotFoundException ex)
-	{
-        ApiError apiError = new ApiError(NOT_FOUND, ex.getMessage());
-        return new ResponseEntity<>(apiError, apiError.status);
-    }
-	
-	@ExceptionHandler(BookNotAvailableException.class)
-    protected ResponseEntity<Object> handleBookNotAvailableException(BookNotAvailableException ex)
 	{
         ApiError apiError = new ApiError(NOT_FOUND, ex.getMessage());
         return new ResponseEntity<>(apiError, apiError.status);

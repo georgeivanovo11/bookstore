@@ -3,17 +3,14 @@ package com.app.views;
 import com.app.models.*;
 
 public class CustomerView {
-	public long id;
+	public Long id;
 	public String name;
-	public double balance;
+	public Double balance;
 	
 	public CustomerView(){
-		this.id = 0;
-		this.name = "";
-		this.balance = 0;
 	}
 	
-	public CustomerView(long id, String name, double balance){
+	public CustomerView(Long id, String name, Double balance){
 		this.id = id;
 		this.name = name;
 		this.balance = balance;

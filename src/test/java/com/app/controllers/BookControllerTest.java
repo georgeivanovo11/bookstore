@@ -1,10 +1,8 @@
 package com.app.controllers;
 
-import static org.assertj.core.api.Assertions.*;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
-import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -21,7 +19,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import com.app.models.*;
 import com.app.views.*;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -96,11 +93,7 @@ public class BookControllerTest {
 
 		ResponseEntity<BookView> response = restTemplate.exchange(
 											createURLWithPort("/books"),
-											HttpMethod.POST, entity, BookView.class);
-		
-		BookView actual = response.getBody();
-		BookView expected = book; 
-		
+											HttpMethod.POST, entity, BookView.class);	
 		assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
     }
     
@@ -112,9 +105,6 @@ public class BookControllerTest {
 		ResponseEntity<BookView> response = restTemplate.exchange(
 											createURLWithPort("/books"),
 											HttpMethod.POST, entity, BookView.class);
-		BookView actual = response.getBody();
-		BookView expected = book; 
-		
 		assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
     }
 
@@ -126,10 +116,6 @@ public class BookControllerTest {
 		ResponseEntity<BookView> response = restTemplate.exchange(
 											createURLWithPort("/books"),
 											HttpMethod.POST, entity, BookView.class);
-		
-		BookView actual = response.getBody();
-		BookView expected = book; 
-		
 		assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
     }
 	
@@ -179,67 +165,6 @@ public class BookControllerTest {
 		assertEquals("author2", actual[1].author);
     }
 
-	
-	
-//	@Test
-//    public void should_return_OK_and_count_if_all_books_exist(){
-//		DeliveryView delivery = new DeliveryView();
-//		BookItemView item1 = new BookItemView(1,3,350.0);
-//		BookItemView item2 = new BookItemView(2,2,250.0);
-//		delivery.books = new BookItemView[2];
-//		delivery.books[0]=item1;
-//		delivery.books[1]=item2;
-//		
-//		HttpEntity<DeliveryView> entity = new HttpEntity<DeliveryView>(delivery, headers);
-//
-//		ResponseEntity<DeliveryOutView> response = restTemplate.exchange(
-//											createURLWithPort("/delivery"),
-//											HttpMethod.POST, entity, DeliveryOutView.class);
-//		DeliveryOutView actual = response.getBody();
-//		int expected = 2;
-//		assertEquals(HttpStatus.ACCEPTED, response.getStatusCode());
-//		assertEquals(expected, actual.numberOfSavedBooks);
-//    }
-//	
-//	@Test
-//    public void should_return_OK_and_count_if_at_least_one_book_exists(){
-//		DeliveryView delivery = new DeliveryView();
-//		BookItemView item1 = new BookItemView(1,3,350.0);
-//		BookItemView item2 = new BookItemView(18,2,250.0);
-//		delivery.books = new BookItemView[2];
-//		delivery.books[0]=item1;
-//		delivery.books[1]=item2;
-//		
-//		HttpEntity<DeliveryView> entity = new HttpEntity<DeliveryView>(delivery, headers);
-//
-//		ResponseEntity<DeliveryOutView> response = restTemplate.exchange(
-//											createURLWithPort("/delivery"),
-//											HttpMethod.POST, entity, DeliveryOutView.class);
-//		DeliveryOutView actual = response.getBody();
-//		int expected = 1;
-//		assertEquals(HttpStatus.ACCEPTED, response.getStatusCode());
-//		assertEquals(expected, actual.numberOfSavedBooks);
-//    }
-//	
-//	@Test
-//    public void should_return_CONFLICT_if_all_specified_books_do_not_exist(){
-//		DeliveryView delivery = new DeliveryView();
-//		BookItemView item1 = new BookItemView(21,3,350.0);
-//		BookItemView item2 = new BookItemView(18,2,250.0);
-//		delivery.books = new BookItemView[2];
-//		delivery.books[0]=item1;
-//		delivery.books[1]=item2;
-//		
-//		HttpEntity<DeliveryView> entity = new HttpEntity<DeliveryView>(delivery, headers);
-//
-//		ResponseEntity<DeliveryOutView> response = restTemplate.exchange(
-//											createURLWithPort("/delivery"),
-//											HttpMethod.POST, entity, DeliveryOutView.class);
-//		DeliveryOutView actual = response.getBody();
-//		int expected = 0;
-//		assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
-//		assertEquals(expected, actual.numberOfSavedBooks);
-//    }
 	
     private String createURLWithPort(String uri) {
 		return "http://localhost:" + port + uri;

@@ -3,13 +3,21 @@ package com.app.views;
 import com.app.models.*;
 
 public class PurchaseView {
-	public long id;
+	public Long id;
 	public String status; 
-	public double totalPayment;
-	public long customer_id;
+	public Double totalPayment;
+	public Long customer_id;
 	public long[] books;
 	
 	public PurchaseView(){
+	}
+	
+	public PurchaseView(Long id, String status, Double tp, Long customer_id){
+		this.id = id;
+		this.status = status;
+		this.totalPayment = tp;
+		this.customer_id = customer_id;
+		this.books = new long [0];
 	}
 	
 	public PurchaseView(Purchase purchase){
