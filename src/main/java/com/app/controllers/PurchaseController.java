@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.EntityNotFoundException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,7 +15,10 @@ import com.app.repositories.StoreRepository;
 import com.app.services.*;
 import com.app.utilities.PurchaseAlreadyCanceledException;
 import com.app.utilities.PurchaseAlreadyPaidException;
+import com.app.utilities.BookNotAvailableException;
 import com.app.utilities.CustomerNotEnoughMoneyException;
+import com.app.utilities.EntityNotFoundException;
+import com.app.utilities.InvalidInputDataException;
 import com.app.utilities.PurchaseNotFoundException;
 import com.app.utilities.StoreNotEnoughMoneyException;
 import com.app.views.*;
@@ -30,11 +32,11 @@ public class PurchaseController {
 	@Autowired
 	private PurchaseService service;
 
-//	@PostMapping("/purchases")
-//	public @ResponseBody ResponseEntity<PurchaseView> createOne(@RequestBody PurchaseView view) throws CustomerNotFoundException, BookNotFoundException, BookNotAvailableException, CustomerNotEnoughMoneyException, PurchaseNotFoundException{
-//		PurchaseView pv = new PurchaseView(service.createPurchase(view));
-//		return new ResponseEntity<PurchaseView>(pv, HttpStatus.CREATED);
-//	}
+	@PostMapping("/purchases")
+	public @ResponseBody ResponseEntity<PurchaseView> createOne(@RequestBody PurchaseView view) throws InvalidInputDataException, EntityNotFoundException, BookNotAvailableException, CustomerNotEnoughMoneyException {
+		PurchaseView pv = new PurchaseView(service.createPurchase(view));
+		return new ResponseEntity<PurchaseView>(pv, HttpStatus.CREATED);
+	}
 //	
 //	@PutMapping("/purchases/{id}/pay")
 //	public @ResponseBody ResponseEntity<HttpStatus> payOne(@PathVariable("id") long id) throws EntityNotFoundException, PurchaseNotFoundException, PurchaseAlreadyPaidException, BookNotAvailableException, CustomerNotEnoughMoneyException{
@@ -48,9 +50,9 @@ public class PurchaseController {
 //		return new ResponseEntity<HttpStatus>(HttpStatus.OK);
 //	}
 //	
-//	@GetMapping("/purchases/{id}")
-//	public @ResponseBody PurchaseView getOne(@PathVariable("id") long id) throws EntityNotFoundException {
-//		return new PurchaseView(service.getPurchase(id));
-//	}
+	@GetMapping("/purchases/{id}")
+	public @ResponseBody PurchaseView getOne(@PathVariable("id") long id) throws EntityNotFoundException {
+		return new PurchaseView(service.getPurchase(id));
+	}
 	
 }

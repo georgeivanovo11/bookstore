@@ -5,8 +5,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import javax.persistence.EntityNotFoundException;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,63 +39,61 @@ public class PurchaseService {
 	@Autowired
     private StoreRepository storeRepository;
 	
-	public Purchase getPurchase(long id) {
+	public Purchase getPurchase(long id) throws EntityNotFoundException {
 		Optional<Purchase> purchase = purchaseRepository.findById(id);
 		if (!purchase.isPresent()) {
-			String message = "Purchase with id: " + id + " doesn't exist!";
-            throw new EntityNotFoundException(message);
+            throw new EntityNotFoundException("purchase",id);
         }
         return purchase.get();
     }
 	
-//	public Purchase createPurchase(PurchaseView view) throws CustomerNotFoundException, BookNotFoundException, BookNotAvailableException, CustomerNotEnoughMoneyException, PurchaseNotFoundException {
-//				
-//		//----------------------------check---------------------------------------		
-//		Optional<Customer> _customer = customerRepository.findById(view.customer_id);
-//		if (!_customer.isPresent()) {
-//			throw new CustomerNotFoundException(view.customer_id);
-//        }
-//		Customer customer = _customer.get();
-//		
-//		List<Long> notAvailableList = new ArrayList<Long>();
-//		double totalPayment = 0;
-//		for(long id: view.books) {
-//			Optional<Book> _book = bookRepository.findById(id);
-//			if (!_book.isPresent()) {
-//				throw new BookNotFoundException(id);
-//	        }
-//			Book book = _book.get();
-//			int amount = book.getWarehouse().getAmount();
-//			if(amount<=0) {
-//				notAvailableList.add(id);
-//			}
-//			totalPayment += book.getWarehouse().getPrice();
-//		}
-//		
-//		if(notAvailableList.size()>0) {
-//			throw new BookNotAvailableException(notAvailableList);
-//		}
-//		
-//		if(customer.getBalance() - totalPayment < 0 ) {
-//			throw new CustomerNotEnoughMoneyException(view.customer_id);
-//		}
-//	
-//		//-----------------------------act-------------------------------------------
-//		Purchase purchase = new Purchase("pending");
-//		purchase.setCustomer(customer);
-//		
-//		for(long id: view.books) {
-//			Book book = bookRepository.findById(id).get();
-//			Purchasebook pb = new Purchasebook(book,purchase);
-//			book.getPurchasebooks().add(pb);
-//			purchaseRepository.save(purchase);
-//			bookRepository.save(book);	
-//		}
-//		purchase.setTotalPayment(totalPayment);
-//		Purchase saved = purchaseRepository.save(purchase);
-//		
-//		return saved;
-//    }
+	public Purchase createPurchase(PurchaseView view) throws InvalidInputDataException, EntityNotFoundException, BookNotAvailableException, CustomerNotEnoughMoneyException {
+		if(view.customer_id == null) {
+			throw new InvalidInputDataException("customer_id");
+		}
+		if(view.books == null) {
+			throw new InvalidInputDataException("books");
+		}
+		//----------------------------check---------------------------------------		
+		Optional<Customer> _customer = customerRepository.findById(view.customer_id);
+		if (!_customer.isPresent()) {
+			throw new EntityNotFoundException("customer",view.customer_id);
+        }
+		Customer customer = _customer.get();
+		
+		double totalPayment = 0;
+		for(long id: view.books) {
+			Optional<Book> _book = bookRepository.findById(id);
+			if (!_book.isPresent()) {
+				throw new EntityNotFoundException("book",id);
+	        }
+			Book book = _book.get();
+			if(book.getWarehouse()==null || book.getWarehouse().getAmount() <=0 ) {
+				throw new BookNotAvailableException(id);
+			}
+			totalPayment += book.getWarehouse().getPrice();
+		}
+		
+		if(customer.getBalance() - totalPayment < 0 ) {
+			throw new CustomerNotEnoughMoneyException(view.customer_id);
+		}
+	
+		//-----------------------------act-------------------------------------------
+		Purchase purchase = new Purchase("pending");
+		purchase.setCustomer(customer);
+		
+		for(long id: view.books) {
+			Book book = bookRepository.findById(id).get();
+			Purchasebook pb = new Purchasebook(book,purchase);
+			book.getPurchasebooks().add(pb);
+			purchaseRepository.save(purchase);
+			bookRepository.save(book);	
+		}
+		purchase.setTotalPayment(totalPayment);
+		Purchase saved = purchaseRepository.save(purchase);
+		
+		return saved;
+    }
 //	
 //	public void payPurchase(long id) throws PurchaseNotFoundException, PurchaseAlreadyPaidException, BookNotAvailableException, CustomerNotEnoughMoneyException {
 //		Optional<Purchase> _purchase = purchaseRepository.findById(id);

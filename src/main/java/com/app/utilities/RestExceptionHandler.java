@@ -4,12 +4,15 @@ import org.springframework.core.Ordered;
 import org.springframework.core.annotation.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
+
+import javax.validation.ConstraintViolationException;
 
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @ControllerAdvice
@@ -35,6 +38,13 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         ApiError apiError = new ApiError(HttpStatus.CONFLICT, ex.getMessage());
         return new ResponseEntity<>(apiError, apiError.status);
     }
+	
+//	@ExceptionHandler(MethodArgumentNotValidException.class)
+//    protected ResponseEntity<Object> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex)
+//	{
+//        ApiError apiError = new ApiError(HttpStatus.CONFLICT, ex.getMessage());
+//        return new ResponseEntity<>(apiError, apiError.status);
+//    }
 	
 	/////////////////////////////////////////////////////
 	

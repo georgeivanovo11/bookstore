@@ -20,6 +20,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import com.app.models.*;
 import com.app.services.*;
 import com.app.utilities.EntityAlreadyExistsException;
+import com.app.utilities.InvalidInputDataException;
 import com.app.views.*;
 
 @RunWith(SpringRunner.class)
@@ -37,30 +38,93 @@ public class PurchaseControllerTest {
 	@Autowired
     private CustomerService cService;
 	
-//	@Before
-//	public void setUpClass(){
-//		pService.deleteAllPurchases();
-//		cService.deleteAllCustomers();
-////		Customer customer = cService.createCustomer(new Customer("Full Name", 4000));
-////		pService.createPurchase(new Purchase("pending",400,))
-//	   
-//	}
+	@Autowired
+    private StoreService sService;
+	
+	@Autowired
+    private WarehouseService wService;
+	
+	@Autowired
+    private BookService bService;
+	
+	@Before
+	public void setUpClass() throws EntityAlreadyExistsException, InvalidInputDataException{
+		wService.deleteAllLines();
+		bService.deleteAllBooks();
+		pService.deleteAllPurchases();
+		cService.deleteAllCustomers();
+		sService.deleteAllStores();
+		
+		bService.createBook(new BookView( 1L,"title1", "author1"));
+		bService.createBook(new BookView( 2L,"title2", "author2"));
+		cService.createCustomer(new CustomerView(1L,"Customer1", 1000D));
+		sService.createStore(new StoreView(1L,"Store1",5000D));
+		
+		DeliveryView delivery = new DeliveryView();
+		BookItemView item1 = new BookItemView(1L,2,350D);
+		BookItemView item2 = new BookItemView(2L,4,250D);
+		delivery.books = new BookItemView[2];
+		delivery.books[0]=item1;
+		delivery.books[1]=item2;
+		
+		HttpEntity<DeliveryView> entity = new HttpEntity<DeliveryView>(delivery, headers);
+		ResponseEntity<DeliveryOutView> response = restTemplate.exchange(createURLWithPort("/deliveries"),
+										 HttpMethod.POST, entity, DeliveryOutView.class);
+	}
 	
 	@Test
-    public void should_save_book_with_autoId_if_id_is_not_specified(){
-//    	BookView book = new BookView(0,"title3","author3");
-//		HttpEntity<BookView> entity = new HttpEntity<BookView>(book, headers);
-//
-//		ResponseEntity<BookView> response = restTemplate.exchange(
-//											createURLWithPort("/books"),
-//											HttpMethod.POST, entity, BookView.class);
-//		
-//		BookView actual = response.getBody();
-//		BookView expected = book; 
-//		
-//		assertEquals(HttpStatus.CREATED, response.getStatusCode());
-//		assertEquals(expected.author, actual.author);
-//		assertEquals(expected.title, actual.title);
+    public void shouldSavePurchase_ifAllInputDataIsValid(){
+		PurchaseView pv = new PurchaseView();
+		pv.customer_id = 1L;
+		pv.books = new long[2];
+		pv.books[0]=1L;
+		pv.books[1]=2L;
+		HttpEntity<PurchaseView> entity = new HttpEntity<PurchaseView>(pv, headers);
+
+		ResponseEntity<PurchaseView> response = restTemplate.exchange(
+											createURLWithPort("/purchases"),
+											HttpMethod.POST, entity, PurchaseView.class); 
+		long id = response.getBody().id;
+		assertEquals(HttpStatus.CREATED, response.getStatusCode());
+		
+		String url = "/purchases/" + id;
+		ResponseEntity<PurchaseView> response2 = restTemplate.exchange(
+				createURLWithPort(url),
+				HttpMethod.GET, null, PurchaseView.class);
+		PurchaseView actual = response2.getBody(); 
+		
+		assertEquals(HttpStatus.OK, response2.getStatusCode());
+		assertEquals(600D, actual.totalPayment,0.1);
+		assertEquals("pending", actual.status);
+		assertEquals(2, actual.books.length);
+    }
+	
+	@Test
+    public void shouldNotSavePurchase_ifCustomerIdIsNotSpecified(){
+		PurchaseView pv = new PurchaseView();
+		pv.customer_id = null;
+		pv.books = new long[2];
+		pv.books[0]=1L;
+		pv.books[1]=2L;
+		HttpEntity<PurchaseView> entity = new HttpEntity<PurchaseView>(pv, headers);
+
+		ResponseEntity<PurchaseView> response = restTemplate.exchange(
+											createURLWithPort("/purchases"),
+											HttpMethod.POST, entity, PurchaseView.class);
+		assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
+    }
+	
+	@Test
+    public void shouldNotSavePurchase_ifBooksIsNotSpecified(){
+		PurchaseView pv = new PurchaseView();
+		pv.customer_id = 1L;
+		pv.books = null;
+		HttpEntity<PurchaseView> entity = new HttpEntity<PurchaseView>(pv, headers);
+
+		ResponseEntity<PurchaseView> response = restTemplate.exchange(
+											createURLWithPort("/purchases"),
+											HttpMethod.POST, entity, PurchaseView.class);
+		assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
     }
 	
 	private String createURLWithPort(String uri) {
