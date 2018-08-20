@@ -3,14 +3,26 @@ package com.app.controllers;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.Valid;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.Errors;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import com.app.models.*;
 import com.app.services.*;
+import com.app.utilities.BookNotAvailableException;
 import com.app.utilities.EntityAlreadyExistsException;
 import com.app.utilities.EntityNotFoundException;
 import com.app.utilities.InvalidInputDataException;
@@ -24,9 +36,12 @@ public class BookController {
 	
 	@Autowired
 	private BookService service;
+	
+	ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+	Validator validator = factory.getValidator();
 
 	@PostMapping("/books")
-	public @ResponseBody ResponseEntity<BookView> createOne(@RequestBody BookView view) throws EntityAlreadyExistsException, InvalidInputDataException{
+	public @ResponseBody ResponseEntity<BookView> createOne(@RequestBody BookView view) throws EntityAlreadyExistsException, InvalidInputDataException {
 		Book savedBook = service.createBook(view);
 		BookView savedBookView = new BookView(savedBook);
 		return new ResponseEntity<BookView>(savedBookView, HttpStatus.CREATED);

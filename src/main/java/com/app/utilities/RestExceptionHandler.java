@@ -7,16 +7,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+import org.springframework.web.servlet.mvc.support.DefaultHandlerExceptionResolver;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
-import javax.validation.ConstraintViolationException;
 
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @ControllerAdvice
-public class RestExceptionHandler extends ResponseEntityExceptionHandler {
+public class RestExceptionHandler extends   DefaultHandlerExceptionResolver {
 	
 	@ExceptionHandler(EntityAlreadyExistsException.class)
     protected ResponseEntity<Object> handleEntityAlreadyExistsException(EntityAlreadyExistsException ex)
@@ -39,12 +41,17 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(apiError, apiError.status);
     }
 	
-//	@ExceptionHandler(MethodArgumentNotValidException.class)
-//    protected ResponseEntity<Object> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex)
-//	{
-//        ApiError apiError = new ApiError(HttpStatus.CONFLICT, ex.getMessage());
-//        return new ResponseEntity<>(apiError, apiError.status);
-//    }
+	@ExceptionHandler(Exception.class)
+    protected ResponseEntity<Object> handleException(Exception ex)
+	{
+        ApiError apiError = new ApiError(HttpStatus.CONFLICT, ex.getMessage());
+        return new ResponseEntity<>(apiError, apiError.status);
+    }
+	
+	@ExceptionHandler(Throwable.class)
+    public ResponseEntity<Object> handleThrowable(Throwable ex) {
+        return new ResponseEntity<Object>(ex, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 	
 	/////////////////////////////////////////////////////
 	

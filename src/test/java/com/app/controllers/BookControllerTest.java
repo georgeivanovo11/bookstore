@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import java.io.IOException;
 
+import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -53,7 +54,7 @@ public class BookControllerTest {
     
     @Test
     public void shouldSaveBookWithAutoId_ifIdIsNotSpecified(){
-    	BookView book = new BookView(null,"title3","author3");
+    	BookView book = new BookView(null,"title3","author3","test");
 		HttpEntity<BookView> entity = new HttpEntity<BookView>(book, headers);
 
 		ResponseEntity<BookView> response = restTemplate.exchange(
@@ -70,7 +71,7 @@ public class BookControllerTest {
     
     @Test
     public void shouldSaveBookWithGivenId_ifIdIsSpecified(){
-    	BookView book = new BookView( 99L,"title99","author99");
+    	BookView book = new BookView( 99L,"title99","author99","test");
 		HttpEntity<BookView> entity = new HttpEntity<BookView>(book, headers);
 
 		ResponseEntity<BookView> response = restTemplate.exchange(
@@ -88,34 +89,34 @@ public class BookControllerTest {
     
     @Test
     public void shouldNotSaveBook_ifTitleIsNotSpecified(){
-    	BookView book = new BookView( 3L,null,"author3");
+    	BookView book = new BookView( 3L,null,"author3","new");
 		HttpEntity<BookView> entity = new HttpEntity<BookView>(book, headers);
 
-		ResponseEntity<BookView> response = restTemplate.exchange(
+		ResponseEntity<JSONObject> response = restTemplate.exchange(
 											createURLWithPort("/books"),
-											HttpMethod.POST, entity, BookView.class);	
+											HttpMethod.POST, entity, JSONObject.class);	
 		assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
     }
     
     @Test
     public void shouldNotSaveBook_ifAuthorIsNotSpecified(){
-    	BookView book = new BookView( 3L,"title3",null);
+    	BookView book = new BookView( 3L,"title3",null,"test");
 		HttpEntity<BookView> entity = new HttpEntity<BookView>(book, headers);
 
-		ResponseEntity<BookView> response = restTemplate.exchange(
+		ResponseEntity<JSONObject> response = restTemplate.exchange(
 											createURLWithPort("/books"),
-											HttpMethod.POST, entity, BookView.class);
+											HttpMethod.POST, entity, JSONObject.class);
 		assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
     }
 
 	@Test
     public void shouldNotSaveBook_ifSpecifiedIdAlreadyExists(){
-    	BookView book = new BookView( 2L ,"title2","author2");
+    	BookView book = new BookView( 2L ,"title2","author2","test");
 		HttpEntity<BookView> entity = new HttpEntity<BookView>(book, headers);
 
-		ResponseEntity<BookView> response = restTemplate.exchange(
+		ResponseEntity<JSONObject> response = restTemplate.exchange(
 											createURLWithPort("/books"),
-											HttpMethod.POST, entity, BookView.class);
+											HttpMethod.POST, entity, JSONObject.class);
 		assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
     }
 	
@@ -126,7 +127,7 @@ public class BookControllerTest {
 											HttpMethod.GET, null, BookView.class);
 		
 		BookView actual = response.getBody();
-		BookView expected = new BookView(2L,"title2", "author2"); 
+		BookView expected = new BookView(2L,"title2", "author2","test"); 
 		
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 		assertEquals(expected.id, actual.id);
@@ -136,9 +137,9 @@ public class BookControllerTest {
 	
 	@Test
     public void shouldReturnError_ifBookWithSpecifiedIdDoesNotExist(){
-		ResponseEntity<BookView> response = restTemplate.exchange(
+		ResponseEntity<JSONObject> response = restTemplate.exchange(
 											createURLWithPort("/books/9"),
-											HttpMethod.GET, null, BookView.class);
+											HttpMethod.GET, null, JSONObject.class);
 		assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
 

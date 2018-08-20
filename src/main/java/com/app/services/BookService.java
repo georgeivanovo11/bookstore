@@ -19,12 +19,6 @@ public class BookService {
     private BookRepository repository;
 	
 	public Book createBook(BookView view) throws EntityAlreadyExistsException, InvalidInputDataException {
-		if(view.author == null) {
-			throw new InvalidInputDataException("author");
-		}
-		if(view.title == null) {
-			throw new InvalidInputDataException("title");
-		}
 		if(view.id != null && repository.existsById(view.id)) {
 			throw new EntityAlreadyExistsException("book", view.id);
 		}
