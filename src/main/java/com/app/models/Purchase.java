@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -15,23 +16,27 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.GenericGenerator;
+
 import com.app.views.*;
 import com.app.models.*;
 
 @Entity
 @Table(name = "purchase")
 public class Purchase  {
-	
 	@Id
-	@Column(name = "purchase_id")
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	private long id;
+	@Basic(optional = false)
+	@GeneratedValue(strategy=GenerationType.IDENTITY, generator="IdOrGenerated")
+	@GenericGenerator(name="IdOrGenerated",
+	                  strategy="com.app.utilities.UseIdOrGenerate")
+	@Column(name = "purchase_id",nullable = false)
+	private Long id;
 	
 	@Column(name = "status")
 	private String status;
 	
 	@Column(name = "totalpayment")
-	private double totalPayment;
+	private Double totalPayment;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "customer_id")
@@ -44,12 +49,13 @@ public class Purchase  {
 	public Purchase()
 	{}
 	
-	public Purchase(String status) {
+	public Purchase(Long id, String status) {
+		this.id = id;
 		this.status = status;
         purchasebooks = new HashSet<>();
 	}
 	
-	public Purchase(String status, double totalPayment, Customer customer) {
+	public Purchase(String status, Double totalPayment, Customer customer) {
 		this.status = status;
 		this.totalPayment = totalPayment;
 		this.customer = customer;
@@ -57,11 +63,11 @@ public class Purchase  {
 	}
 	
 	
-	public long getId() {
+	public Long getId() {
         return this.id;
     }
 	
-	public void setId(long id){
+	public void setId(Long id){
 		this.id = id;
 	}
 	
@@ -74,11 +80,11 @@ public class Purchase  {
 	}
 	
 	
-	public double getTotalPayment(){
+	public Double getTotalPayment(){
         return this.totalPayment;
     }
 	
-	public void setTotalPayment(double totalPayment){
+	public void setTotalPayment(Double totalPayment){
 		this.totalPayment = totalPayment;
 	}
 	

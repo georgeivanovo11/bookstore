@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import java.io.IOException;
 
+import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -47,7 +48,7 @@ public class StoreControllerTest {
     
     @Test
     public void shouldSaveStoreWithAutoId_ifIdIsNotSpecified(){
-    	StoreView store = new StoreView(null,"shop3",300D);
+    	StoreView store = new StoreView(null,"shop3",300D,"test");
 		HttpEntity<StoreView> entity = new HttpEntity<StoreView>(store, headers);
 
 		ResponseEntity<StoreView> response = restTemplate.exchange(
@@ -64,7 +65,7 @@ public class StoreControllerTest {
     
     @Test
     public void shouldSaveStoreWithGivenId_ifIdIsSpecified(){
-    	StoreView store = new StoreView(99L,"shop99",500D);
+    	StoreView store = new StoreView(99L,"shop99",500D,"test");
 		HttpEntity<StoreView> entity = new HttpEntity<StoreView>(store, headers);
 
 		ResponseEntity<StoreView> response = restTemplate.exchange(
@@ -82,34 +83,34 @@ public class StoreControllerTest {
     
     @Test
     public void shouldNotSaveStore_ifTitleIsNotSpecified(){
-    	StoreView store = new StoreView(3L,null,500D);
+    	StoreView store = new StoreView(3L,null,500D,"test");
 		HttpEntity<StoreView> entity = new HttpEntity<StoreView>(store, headers);
 
-		ResponseEntity<StoreView> response = restTemplate.exchange(
+		ResponseEntity<JSONObject> response = restTemplate.exchange(
 											createURLWithPort("/stores"),
-											HttpMethod.POST, entity, StoreView.class);
+											HttpMethod.POST, entity, JSONObject.class);
 		assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
     }
     
     @Test
     public void shouldNotSaveStore_ifBalanceIsNotSpecified(){
-    	StoreView store = new StoreView(3L,"shop",null);
+    	StoreView store = new StoreView(3L,"shop",null,"test");
 		HttpEntity<StoreView> entity = new HttpEntity<StoreView>(store, headers);
 
-		ResponseEntity<StoreView> response = restTemplate.exchange(
+		ResponseEntity<JSONObject> response = restTemplate.exchange(
 											createURLWithPort("/stores"),
-											HttpMethod.POST, entity, StoreView.class);	
+											HttpMethod.POST, entity, JSONObject.class);	
 		assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
     }
     
     @Test
     public void shouldNotSaveStore_ifSpecifiedIdAlreadyExists(){
-    	StoreView store = new StoreView(2L,"shop",500D);
+    	StoreView store = new StoreView(2L,"shop",500D,"test");
 		HttpEntity<StoreView> entity = new HttpEntity<StoreView>(store, headers);
 
-		ResponseEntity<StoreView> response = restTemplate.exchange(
+		ResponseEntity<JSONObject> response = restTemplate.exchange(
 											createURLWithPort("/stores"),
-											HttpMethod.POST, entity, StoreView.class);	
+											HttpMethod.POST, entity, JSONObject.class);	
 		assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
     }
     	
@@ -120,7 +121,7 @@ public class StoreControllerTest {
 											HttpMethod.GET, null, StoreView.class);
 		
 		StoreView actual = response.getBody();
-		StoreView expected = new StoreView(2L,"shop2",200D ); 
+		StoreView expected = new StoreView(2L,"shop2",200D,"test"); 
 		
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 		assertEquals(expected.id, actual.id);
@@ -130,9 +131,9 @@ public class StoreControllerTest {
 	
 	@Test
     public void shouldReturnError_ifStoreWithSpecifiedIdDoesNotExist(){
-		ResponseEntity<StoreView> response = restTemplate.exchange(
+		ResponseEntity<JSONObject> response = restTemplate.exchange(
 											createURLWithPort("/stores/9"),
-											HttpMethod.GET, null, StoreView.class);
+											HttpMethod.GET, null, JSONObject.class);
 		assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
 	

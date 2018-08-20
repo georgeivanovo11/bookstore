@@ -1,6 +1,9 @@
 package com.app.views;
 
 import com.app.models.*;
+import com.app.utilities.InvalidInputDataException;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class PurchaseView {
 	public Long id;
@@ -12,7 +15,23 @@ public class PurchaseView {
 	public PurchaseView(){
 	}
 	
-	public PurchaseView(Long id, String status, Double tp, Long customer_id){
+	@JsonCreator
+	public PurchaseView(@JsonProperty(value = "id") Long id,
+						@JsonProperty(value = "customer_id", required = true) Long customer_id,
+						@JsonProperty(value = "books", required = true) long[] books) throws InvalidInputDataException
+	{
+		this.id=id;
+		if(customer_id==null) {
+			 throw new InvalidInputDataException("customer");
+		 }
+		this.customer_id = customer_id;
+		if(books==null) {
+			 throw new InvalidInputDataException("books");
+		 }
+		this.books = books;
+	}
+	
+	public PurchaseView( Long id,String status, Double tp, Long customer_id){
 		this.id = id;
 		this.status = status;
 		this.totalPayment = tp;

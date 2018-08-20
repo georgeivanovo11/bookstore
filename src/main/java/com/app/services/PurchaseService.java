@@ -48,12 +48,6 @@ public class PurchaseService {
     }
 	
 	public Purchase createPurchase(PurchaseView view) throws InvalidInputDataException, EntityNotFoundException, BookNotAvailableException, CustomerNotEnoughMoneyException {
-		if(view.customer_id == null) {
-			throw new InvalidInputDataException("customer_id");
-		}
-		if(view.books == null) {
-			throw new InvalidInputDataException("books");
-		}
 		//----------------------------check---------------------------------------		
 		Optional<Customer> _customer = customerRepository.findById(view.customer_id);
 		if (!_customer.isPresent()) {
@@ -79,7 +73,8 @@ public class PurchaseService {
 		}
 	
 		//-----------------------------act-------------------------------------------
-		Purchase purchase = new Purchase("pending");
+		
+		Purchase purchase = new Purchase(view.id,"pending");
 		purchase.setCustomer(customer);
 		
 		for(long id: view.books) {
