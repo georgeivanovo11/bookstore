@@ -1,20 +1,9 @@
 package com.app.views;
 
 
-import java.io.Serializable;
-
-import javax.persistence.Column;
-import javax.persistence.OneToOne;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
-
 import com.app.models.*;
 import com.app.utilities.InvalidInputDataException;
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class BookView{
@@ -25,8 +14,8 @@ public class BookView{
 	
 	 @JsonCreator
 	 public BookView(@JsonProperty(value = "id") Long id,
-			         @JsonProperty(value = "title", required = true, defaultValue= "") String title, 
-	                 @JsonProperty(value = "author", required = true, defaultValue= "") String author) throws InvalidInputDataException
+			         @JsonProperty(value = "title", required = true) String title, 
+	                 @JsonProperty(value = "author", required = true) String author) throws InvalidInputDataException
 	 {
 		 this.id = id;
 		 if(title==null) {

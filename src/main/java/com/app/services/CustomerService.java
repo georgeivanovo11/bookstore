@@ -28,12 +28,6 @@ public class CustomerService {
     private CustomerRepository repository;
 	
 	public Customer createCustomer(CustomerView view) throws EntityAlreadyExistsException, InvalidInputDataException {
-		if(view.name == null) {
-			throw new InvalidInputDataException("name");
-		}
-		if(view.balance == null) {
-			throw new InvalidInputDataException("balance");
-		}
 		if(view.id != null && repository.existsById(view.id)) {
 			throw new EntityAlreadyExistsException("customer", view.id);
 		}
@@ -42,9 +36,6 @@ public class CustomerService {
     }
 	
 	public Customer getCustomer(Long id) throws EntityNotFoundException, InvalidInputDataException  {
-		if(id == null) {
-			throw new InvalidInputDataException("id");
-		}
 		Optional<Customer> customer = repository.findById(id);
 		if (!customer.isPresent()) {
             throw new EntityNotFoundException("customer",id);
@@ -58,12 +49,6 @@ public class CustomerService {
     }
 	
 	public void changeMoney(Long id, Double money) throws EntityNotFoundException, InvalidInputDataException {
-		if(id == null) {
-			throw new InvalidInputDataException("id");
-		}
-		if(money == null) {
-			throw new InvalidInputDataException("balance");
-		}
 		Optional<Customer> _customer = repository.findById(id);
 		if (!_customer.isPresent()) {
             throw new EntityNotFoundException("customer",id);
@@ -74,9 +59,6 @@ public class CustomerService {
 	}
 	
 	public List<Purchase> getPurchasesOfTheCustomer(Long id) throws EntityNotFoundException, InvalidInputDataException{
-		if(id == null) {
-			throw new InvalidInputDataException("id");
-		}
 		Optional<Customer> _customer = repository.findById(id);
 		if (!_customer.isPresent()) {
             throw new EntityNotFoundException("book", id);

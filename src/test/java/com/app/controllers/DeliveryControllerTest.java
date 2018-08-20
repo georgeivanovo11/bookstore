@@ -43,10 +43,17 @@ public class DeliveryControllerTest {
 	
 	@Before
 	public void setUpClass() throws EntityAlreadyExistsException, InvalidInputDataException {
-	   wService.deleteAllLines();
-	   bService.deleteAllBooks();
-	   bService.createBook(new BookView( 1L,"title1", "author1"));
-	   bService.createBook(new BookView( 2L,"title2", "author2"));
+	    wService.deleteAllLines();
+	    bService.deleteAllBooks();
+	    bService.createBook(new BookView( 1L,"title1", "author1"));
+	    bService.createBook(new BookView( 2L,"title2", "author2"));
+	    DeliveryView delivery = new DeliveryView();
+		BookItemView item1 = new BookItemView(1L,2,350D);
+		delivery.books = new BookItemView[1];
+		delivery.books[0]=item1;
+		HttpEntity<DeliveryView> entity = new HttpEntity<DeliveryView>(delivery, headers);
+		ResponseEntity<DeliveryOutView> response = restTemplate.exchange(createURLWithPort("/deliveries"),
+										 HttpMethod.POST, entity, DeliveryOutView.class);
 	}
     
 	@Test
@@ -73,7 +80,7 @@ public class DeliveryControllerTest {
 		assertEquals(2, actual.length);
 
 		assertEquals(1L, actual[0].id.longValue());
-		assertEquals(2, actual[0].amount.intValue());
+		assertEquals(4, actual[0].amount.intValue());
 		assertEquals(350D, actual[0].price.doubleValue(),0.1);
 		
 		assertEquals(2L, actual[1].id.longValue());
@@ -97,13 +104,56 @@ public class DeliveryControllerTest {
     }
 	
 	@Test
-    public void shouldNotDeliver_ifAtLeastOneBookFieldIsEmpty(){
+    public void shouldNotDeliver_ifAtLeastOneBookIdIsNull(){
+		DeliveryView delivery = new DeliveryView();
+		BookItemView item1 = new BookItemView(1L,2,350D);
+		BookItemView item2 = new BookItemView(null,4,250D);
+		delivery.books = new BookItemView[2];
+		delivery.books[0]=item1;
+		delivery.books[1]=item2;
+		
+		HttpEntity<DeliveryView> entity = new HttpEntity<DeliveryView>(delivery, headers);
+		ResponseEntity<DeliveryOutView> response = restTemplate.exchange(createURLWithPort("/deliveries"),
+										 HttpMethod.POST, entity, DeliveryOutView.class);
+		assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
+    }
+	
+	@Test
+    public void shouldNotDeliver_ifBookFieldAmountIsEmpty(){
 		DeliveryView delivery = new DeliveryView();
 		BookItemView item1 = new BookItemView(1L,2,350D);
 		BookItemView item2 = new BookItemView(6L,null,250D);
 		delivery.books = new BookItemView[2];
 		delivery.books[0]=item1;
 		delivery.books[1]=item2;
+		
+		HttpEntity<DeliveryView> entity = new HttpEntity<DeliveryView>(delivery, headers);
+		ResponseEntity<DeliveryOutView> response = restTemplate.exchange(createURLWithPort("/deliveries"),
+										 HttpMethod.POST, entity, DeliveryOutView.class);
+		assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
+	}
+	
+	@Test
+    public void shouldNotDeliver_ifBookFieldPriceIsEmpty(){
+		DeliveryView delivery = new DeliveryView();
+		BookItemView item1 = new BookItemView(1L,2,350D);
+		BookItemView item2 = new BookItemView(6L,5,null);
+		delivery.books = new BookItemView[2];
+		delivery.books[0]=item1;
+		delivery.books[1]=item2;
+		
+		HttpEntity<DeliveryView> entity = new HttpEntity<DeliveryView>(delivery, headers);
+		ResponseEntity<DeliveryOutView> response = restTemplate.exchange(createURLWithPort("/deliveries"),
+										 HttpMethod.POST, entity, DeliveryOutView.class);
+		assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
+	}
+	
+	@Test
+    public void shouldNotDeliver_ifBooksFieldIsEmpty(){
+		DeliveryView delivery = new DeliveryView();
+		BookItemView item1 = new BookItemView(1L,2,350D);
+		BookItemView item2 = new BookItemView(6L,null,250D);
+		delivery.books = null;
 		
 		HttpEntity<DeliveryView> entity = new HttpEntity<DeliveryView>(delivery, headers);
 		ResponseEntity<DeliveryOutView> response = restTemplate.exchange(createURLWithPort("/deliveries"),

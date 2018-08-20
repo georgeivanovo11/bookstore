@@ -38,9 +38,6 @@ public class StoreService {
     }
 	
 	public Store getStore(Long id) throws EntityNotFoundException, InvalidInputDataException {
-		if(id == null) {
-			throw new InvalidInputDataException("id");
-		}
 		Optional<Store> store = sRepository.findById(id);
 		if (!store.isPresent()) {
             throw new EntityNotFoundException("store",id);

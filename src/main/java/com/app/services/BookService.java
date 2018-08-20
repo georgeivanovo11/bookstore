@@ -27,9 +27,6 @@ public class BookService {
     }
 	
 	public Book getBook(Long id) throws EntityNotFoundException, InvalidInputDataException {
-		if(id == null) {
-			throw new InvalidInputDataException("id");
-		}
 		Optional<Book> book = repository.findById(id);
 		if (!book.isPresent()) {
             throw new EntityNotFoundException("book",id);

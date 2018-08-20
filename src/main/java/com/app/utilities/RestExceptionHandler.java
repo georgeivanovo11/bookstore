@@ -54,13 +54,7 @@ public class RestExceptionHandler extends   DefaultHandlerExceptionResolver {
     }
 	
 	/////////////////////////////////////////////////////
-	
-	@ExceptionHandler(PurchaseNotFoundException.class)
-    protected ResponseEntity<Object> handlePurchaseNotFoundException(PurchaseNotFoundException ex)
-	{
-        ApiError apiError = new ApiError(NOT_FOUND, ex.getMessage());
-        return new ResponseEntity<>(apiError, apiError.status);
-    }
+
 	
 	@ExceptionHandler(PurchaseAlreadyPaidException.class)
     protected ResponseEntity<Object> handlePurchaseAlreadyPaidException(PurchaseAlreadyPaidException ex)

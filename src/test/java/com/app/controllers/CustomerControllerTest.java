@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
 
+import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -42,17 +43,49 @@ public class CustomerControllerTest {
 	@Autowired
     private PurchaseService pService;
 	
+	@Autowired
+    private WarehouseService wService;
+	
+	@Autowired
+    private BookService bService;
+	
 	@Before
 	public void setUpClass() throws EntityAlreadyExistsException, InvalidInputDataException{
+		wService.deleteAllLines();
+		bService.deleteAllBooks();
 		pService.deleteAllPurchases();
 		cService.deleteAllCustomers();
-		cService.createCustomer(new CustomerView(1L, "User1", 300D));
-		cService.createCustomer(new CustomerView(2L, "User2", 400D));
+		bService.createBook(new BookView( 1L,"title1", "author1"));
+		bService.createBook(new BookView( 2L,"title2", "author2"));
+		cService.createCustomer(new CustomerView(1L,"User1", 1000D));
+		cService.createCustomer(new CustomerView(2L,"User2", 400D));
+		
+		DeliveryView delivery = new DeliveryView();
+		BookItemView item1 = new BookItemView(1L,2,350D);
+		BookItemView item2 = new BookItemView(2L,4,250D);
+		delivery.books = new BookItemView[2];
+		delivery.books[0]=item1;
+		delivery.books[1]=item2;
+		
+		HttpEntity<DeliveryView> entity = new HttpEntity<DeliveryView>(delivery, headers);
+		ResponseEntity<DeliveryOutView> response = restTemplate.exchange(createURLWithPort("/deliveries"),
+										 HttpMethod.POST, entity, DeliveryOutView.class);
+		PurchaseView pv = new PurchaseView();
+		pv.customer_id = 1L;
+		pv.books = new long[2];
+		pv.books[0]=1L;
+		pv.books[1]=2L;
+		HttpEntity<PurchaseView> entity2 = new HttpEntity<PurchaseView>(pv, headers);
+
+		ResponseEntity<String> response2 = restTemplate.exchange(
+											createURLWithPort("/purchases"),
+											HttpMethod.POST, entity2, String.class);
+		
 	}
 	
     @Test
     public void shouldSaveCustomerWithAutoId_ifIdIsNotSpecified(){
-    	CustomerView customer = new CustomerView(null,"User3",400D);
+    	CustomerView customer = new CustomerView(null,"User3",400D, "test");
 		HttpEntity<CustomerView> entity = new HttpEntity<CustomerView>(customer, headers);
 
 		ResponseEntity<CustomerView> response = restTemplate.exchange(
@@ -69,7 +102,7 @@ public class CustomerControllerTest {
     
 	@Test
     public void shouldSaveCustomerWithGivenId_ifIdIsSpecified(){
-		CustomerView customer = new CustomerView(6L,"User111",1110D);
+		CustomerView customer = new CustomerView(6L,"User111",1110D, "test");
 		HttpEntity<CustomerView> entity = new HttpEntity<CustomerView>(customer, headers);
 
 		ResponseEntity<CustomerView> response = restTemplate.exchange(
@@ -83,52 +116,38 @@ public class CustomerControllerTest {
 		assertEquals(expected.id, actual.id);
 		assertEquals(expected.name, actual.name);
 		assertEquals(expected.balance, actual.balance,0.1);
-		
-//		CustomerView customer = new CustomerView(null,"User3",400D);
-//		HttpEntity<CustomerView> entity = new HttpEntity<CustomerView>(customer, headers);
-//
-//		ResponseEntity<CustomerView> response = restTemplate.exchange(
-//											createURLWithPort("/customers"),
-//											HttpMethod.POST, entity, CustomerView.class);
-//		
-//		CustomerView actual = response.getBody();
-//		CustomerView expected = customer; 
-//		
-//		assertEquals(HttpStatus.CREATED, response.getStatusCode());
-//		assertEquals(expected.name, actual.name);
-//		assertEquals(expected.balance, actual.balance,0.1);
     }
 	
     @Test
     public void shouldNotSaveCustomer_ifNameIsNotSpecified(){
-    	CustomerView customer = new CustomerView( 3L, null,300D);
+    	CustomerView customer = new CustomerView( 3L, null,1000D, "test");
 		HttpEntity<CustomerView> entity = new HttpEntity<CustomerView>(customer, headers);
 
-		ResponseEntity<CustomerView> response = restTemplate.exchange(
+		ResponseEntity<JSONObject> response = restTemplate.exchange(
 											createURLWithPort("/books"),
-											HttpMethod.POST, entity, CustomerView.class);	
+											HttpMethod.POST, entity, JSONObject.class);	
 		assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
     }
     
     @Test
     public void shouldNotSaveCustomer_ifBalanceIsNotSpecified(){
-    	CustomerView customer = new CustomerView( 3L, "User3",null);
+    	CustomerView customer = new CustomerView( 3L, "User3",null,"test");
 		HttpEntity<CustomerView> entity = new HttpEntity<CustomerView>(customer, headers);
 
-		ResponseEntity<CustomerView> response = restTemplate.exchange(
+		ResponseEntity<JSONObject> response = restTemplate.exchange(
 											createURLWithPort("/books"),
-											HttpMethod.POST, entity, CustomerView.class);	
+											HttpMethod.POST, entity, JSONObject.class);	
 		assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
     }
 	
 	@Test
     public void shouldNotSaveCustomer_ifSpecifiedIdAlreadyExists(){
-		CustomerView customer = new CustomerView(2L,"User2",400D);
+		CustomerView customer = new CustomerView(2L,"User2",400D,"test");
 		HttpEntity<CustomerView> entity = new HttpEntity<CustomerView>(customer, headers);
 
-		ResponseEntity<CustomerView> response = restTemplate.exchange(
+		ResponseEntity<JSONObject> response = restTemplate.exchange(
 											createURLWithPort("/customers"),
-											HttpMethod.POST, entity, CustomerView.class);
+											HttpMethod.POST, entity, JSONObject.class);
 		assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
     }
 	
@@ -139,7 +158,7 @@ public class CustomerControllerTest {
 											HttpMethod.GET, null, CustomerView.class);
 		
 		CustomerView actual = response.getBody();
-		CustomerView expected = new CustomerView(2L,"User2", 400D); 
+		CustomerView expected = new CustomerView(2L,"User2", 400D,"test"); 
 		
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 		assertEquals(expected.id, actual.id);
@@ -149,9 +168,9 @@ public class CustomerControllerTest {
 	
 	@Test
     public void shouldReturnError_ifCustomerWithSpecifiedIdDoesNotExist(){
-		ResponseEntity<CustomerView> response = restTemplate.exchange(
+		ResponseEntity<JSONObject> response = restTemplate.exchange(
 				createURLWithPort("/customers/9"),
-				HttpMethod.GET, null, CustomerView.class);
+				HttpMethod.GET, null, JSONObject.class);
 		assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
 	
@@ -171,58 +190,67 @@ public class CustomerControllerTest {
 		
 		assertEquals(1L, actual[0].id.longValue());
 		assertEquals("User1", actual[0].name);
-		assertEquals(300, actual[0].balance,0.1);
+		assertEquals(1000, actual[0].balance,0.1);
 
 		assertEquals(2L, actual[1].id.longValue());
 		assertEquals("User2", actual[1].name);
 		assertEquals(400, actual[1].balance,0.1);
     }
 	
-//	@Test
-//    public void shouldReturnListOfPurchasesOfSpecifiedCustomer() throws JsonParseException, JsonMappingException, IOException{
-//		ResponseEntity<String> response = restTemplate.exchange(
-//											createURLWithPort("/customers"),
-//											HttpMethod.GET, null, String.class);
-//		
-//		String actualString = response.getBody();
-//		
-//		ObjectMapper objectMapper = new ObjectMapper();
-//        CustomerView[] actual = objectMapper.readValue(actualString, CustomerView[].class);
-//		
-//		assertEquals(HttpStatus.OK, response.getStatusCode());
-//		assertEquals(2, actual.length);
-//		
-//		assertEquals(1L, actual[0].id);
-//		assertEquals("User1", actual[0].name);
-//		assertEquals(300, actual[0].balance,0.1);
-//
-//		assertEquals(2L, actual[1].id);
-//		assertEquals("User2", actual[1].name);
-//		assertEquals(400, actual[1].balance,0.1);
-//    }
+	@Test
+    public void shouldReturnListOfPurchases_ifIdOfSpecifiedCustomerExists() throws JsonParseException, JsonMappingException, IOException{
+		ResponseEntity<String> response = restTemplate.exchange(
+											createURLWithPort("/customers/1/purchases"),
+											HttpMethod.GET, null, String.class);
+		
+		String actualString = response.getBody();
+		
+		ObjectMapper objectMapper = new ObjectMapper();
+        PurchaseView[] actual = objectMapper.readValue(actualString, PurchaseView[].class);
+		
+		assertEquals(HttpStatus.OK, response.getStatusCode());
+		assertEquals(1, actual.length);
+    }
 	
 	@Test
-    public void shouldUpdateBalanceOfSpecifiedCustomer() {
-		CustomerView customer = new CustomerView(null,null,500D);
+    public void shouldNotReturnListOfPurchases_ifIdOfSpecifiedCustomerDoesNotExist() throws JsonParseException, JsonMappingException, IOException{
+		ResponseEntity<String> response = restTemplate.exchange(
+											createURLWithPort("/customers/3/purchases"),
+											HttpMethod.GET, null, String.class);
+		assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    }
+	
+	@Test
+    public void shouldUpdateBalance_ifCustomerWithSpecifiedIdExists() {
+		CustomerView customer = new CustomerView(null,null,500D,"test");
 		HttpEntity<CustomerView> entity = new HttpEntity<CustomerView>(customer, headers);
 
-		ResponseEntity<CustomerView> response = restTemplate.exchange(
+		ResponseEntity<JSONObject> response = restTemplate.exchange(
 											createURLWithPort("/customers/2/money"),
-											HttpMethod.PUT, entity, CustomerView.class);
+											HttpMethod.PUT, entity, JSONObject.class);
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 		
 		ResponseEntity<CustomerView> response2 = restTemplate.exchange(createURLWithPort("/customers/2"),HttpMethod.GET, null, CustomerView.class);
 		CustomerView actual2 = response2.getBody(); 
 		System.out.println(actual2.id);
-		CustomerView expected2 = new CustomerView(2L,"User2", 500D); 
+		CustomerView expected2 = new CustomerView(2L,"User2", 500D,"test"); 
 
 		assertEquals(HttpStatus.OK, response2.getStatusCode());
 		assertEquals(expected2.id, actual2.id);
 		assertEquals(expected2.balance, actual2.balance,0.1);
 	}
 	
-
 	
+	@Test
+    public void shouldNotUpdateBalance_ifCustomerWithSpecifiedIdDoesNotExist() {
+		CustomerView customer = new CustomerView(null,null,500D,"test");
+		HttpEntity<CustomerView> entity = new HttpEntity<CustomerView>(customer, headers);
+
+		ResponseEntity<JSONObject> response = restTemplate.exchange(
+											createURLWithPort("/customers/3/money"),
+											HttpMethod.PUT, entity, JSONObject.class);
+		assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+	}
 	
 	private String createURLWithPort(String uri) {
 		return "http://localhost:" + port + uri;

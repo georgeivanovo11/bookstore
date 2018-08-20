@@ -50,21 +50,21 @@ public class CustomerController {
 	
 	
 	@PutMapping("/customers/{id}/money")
-	public @ResponseBody ResponseEntity<HttpStatus> updateOne(@PathVariable("id") long id, @RequestBody CustomerView view) throws EntityNotFoundException, com.app.utilities.EntityNotFoundException, InvalidInputDataException {
+	public @ResponseBody ResponseEntity<HttpStatus> updateOne(@PathVariable("id") long id, @RequestBody BalanceView view) throws EntityNotFoundException, com.app.utilities.EntityNotFoundException, InvalidInputDataException {
 		service.changeMoney(id, view.balance);
 		return new ResponseEntity<HttpStatus>(HttpStatus.OK);
 	}
 	
 	
 	@GetMapping("/customers/{id}/purchases")
-	public @ResponseBody List<PurchaseView> getAllPurchases(@PathVariable("id") long id) throws EntityNotFoundException, com.app.utilities.EntityNotFoundException, InvalidInputDataException {
+	public @ResponseBody ResponseEntity<List<PurchaseView>> getAllPurchases(@PathVariable("id") long id) throws EntityNotFoundException, com.app.utilities.EntityNotFoundException, InvalidInputDataException {
 		List<Purchase> purchases = service.getPurchasesOfTheCustomer(id);
 		List<PurchaseView> purchaseViews = new ArrayList<PurchaseView>();
 		for (Purchase p : purchases) {
 			PurchaseView pv = new PurchaseView(p);
 			purchaseViews.add(pv);
 		}
-		return purchaseViews;
+		return new ResponseEntity<List<PurchaseView>>(purchaseViews, HttpStatus.OK);
 	}
 	
 }
