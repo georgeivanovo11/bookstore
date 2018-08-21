@@ -41,6 +41,13 @@ public class RestExceptionHandler extends   DefaultHandlerExceptionResolver {
         return new ResponseEntity<>(apiError, apiError.status);
     }
 	
+	@ExceptionHandler(InvalidPurchaseStatusException.class)
+    protected ResponseEntity<Object> handleInvalidPurchaseStatusException(InvalidPurchaseStatusException ex)
+	{
+        ApiError apiError = new ApiError(HttpStatus.CONFLICT, ex.getMessage());
+        return new ResponseEntity<>(apiError, apiError.status);
+    }
+	
 	@ExceptionHandler(Exception.class)
     protected ResponseEntity<Object> handleException(Exception ex)
 	{
@@ -56,24 +63,12 @@ public class RestExceptionHandler extends   DefaultHandlerExceptionResolver {
 	/////////////////////////////////////////////////////
 
 	
-	@ExceptionHandler(PurchaseAlreadyPaidException.class)
-    protected ResponseEntity<Object> handlePurchaseAlreadyPaidException(PurchaseAlreadyPaidException ex)
-	{
-        ApiError apiError = new ApiError(NOT_FOUND, ex.getMessage());
-        return new ResponseEntity<>(apiError, apiError.status);
-    }
-	
-	@ExceptionHandler(PurchaseAlreadyCanceledException.class)
-    protected ResponseEntity<Object> handlePurchaseAlreadyCanceledException(PurchaseAlreadyCanceledException ex)
-	{
-        ApiError apiError = new ApiError(NOT_FOUND, ex.getMessage());
-        return new ResponseEntity<>(apiError, apiError.status);
-    }
+
 	
 	@ExceptionHandler(CustomerNotEnoughMoneyException.class)
     protected ResponseEntity<Object> handleCustomerNotEnoughMoneyException(CustomerNotEnoughMoneyException ex)
 	{
-        ApiError apiError = new ApiError(NOT_FOUND, ex.getMessage());
+        ApiError apiError = new ApiError(HttpStatus.CONFLICT, ex.getMessage());
         return new ResponseEntity<>(apiError, apiError.status);
     }
 	
