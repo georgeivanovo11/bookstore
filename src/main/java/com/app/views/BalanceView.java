@@ -13,10 +13,7 @@ public class BalanceView {
 	}
 	
 	@JsonCreator
-	public BalanceView(@JsonProperty(value = "balance", required = true) Double balance) throws InvalidInputDataException{
-		if(balance==null) {
-			 throw new InvalidInputDataException("balance");
-		 }
+	public BalanceView(@JsonProperty(value = "balance", required = true) Double balance){
 		this.balance = balance;
 	}
 	

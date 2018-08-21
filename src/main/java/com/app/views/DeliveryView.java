@@ -12,10 +12,7 @@ public class DeliveryView {
 	}
 	
 	@JsonCreator
-	public DeliveryView(@JsonProperty(value = "books", required = true) BookItemView[] books) throws InvalidInputDataException {
-		if(books==null) {
-			 throw new InvalidInputDataException("books");
-		 }
+	public DeliveryView(@JsonProperty(value = "books", required = true) BookItemView[] books){
 		this.books = books;
 	}
 }

@@ -19,19 +19,7 @@ public class StoreView {
 	@JsonCreator
 	public StoreView(@JsonProperty(value = "id") Long id,
 			         @JsonProperty(value = "title", required = true) String title,
-			         @JsonProperty(value = "balance", required = true) Double balance) throws InvalidInputDataException{
-	    this.id = id;
-	    if(title==null) {
-			 throw new InvalidInputDataException("title");
-		 }
-	    this.title = title;
-	    if(balance==null) {
-			 throw new InvalidInputDataException("balance");
-		 }
-	    this.balance = balance;
-	}
-	
-	public StoreView(Long id, String title, Double balance, String mode){
+			         @JsonProperty(value = "balance", required = true) Double balance){
 	    this.id = id;
 	    this.title = title;
 	    this.balance = balance;

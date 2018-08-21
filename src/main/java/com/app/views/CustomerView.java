@@ -16,20 +16,7 @@ public class CustomerView {
 	@JsonCreator
 	public CustomerView(@JsonProperty(value = "id") Long id,
 			 			@JsonProperty(value = "name", required = true) String name,
-			 			@JsonProperty(value = "balance", required = true) Double balance) throws InvalidInputDataException
-	{
-		this.id = id;
-		if(name==null) {
-			 throw new InvalidInputDataException("name");
-		 }
-		this.name = name;
-		if(balance==null) {
-			 throw new InvalidInputDataException("balance");
-		 }
-		this.balance = balance;
-	}
-	
-	public CustomerView( Long id, String name, Double balance,String mode) 
+			 			@JsonProperty(value = "balance", required = true) Double balance)
 	{
 		this.id = id;
 		this.name = name;

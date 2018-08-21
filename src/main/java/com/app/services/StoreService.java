@@ -24,6 +24,12 @@ public class StoreService {
 
 	
 	public Store createStore(StoreView view) throws InvalidInputDataException, EntityAlreadyExistsException {
+		if(view.title==null) {
+			 throw new InvalidInputDataException("title");
+		 }
+		if(view.balance==null) {
+			 throw new InvalidInputDataException("balance");
+		 }
 		if(view.id != null && sRepository.existsById(view.id)) {
 			throw new EntityAlreadyExistsException("store", view.id);
 		}

@@ -85,7 +85,7 @@ public class CustomerControllerTest {
 	
     @Test
     public void shouldSaveCustomerWithAutoId_ifIdIsNotSpecified(){
-    	CustomerView customer = new CustomerView(null,"User3",400D, "test");
+    	CustomerView customer = new CustomerView(null,"User3",400D);
 		HttpEntity<CustomerView> entity = new HttpEntity<CustomerView>(customer, headers);
 
 		ResponseEntity<CustomerView> response = restTemplate.exchange(
@@ -102,7 +102,7 @@ public class CustomerControllerTest {
     
 	@Test
     public void shouldSaveCustomerWithGivenId_ifIdIsSpecified(){
-		CustomerView customer = new CustomerView(6L,"User111",1110D, "test");
+		CustomerView customer = new CustomerView(6L,"User111",1110D);
 		HttpEntity<CustomerView> entity = new HttpEntity<CustomerView>(customer, headers);
 
 		ResponseEntity<CustomerView> response = restTemplate.exchange(
@@ -120,29 +120,29 @@ public class CustomerControllerTest {
 	
     @Test
     public void shouldNotSaveCustomer_ifNameIsNotSpecified(){
-    	CustomerView customer = new CustomerView( 3L, null,1000D, "test");
+    	CustomerView customer = new CustomerView( 3L, null,1000D);
 		HttpEntity<CustomerView> entity = new HttpEntity<CustomerView>(customer, headers);
 
 		ResponseEntity<JSONObject> response = restTemplate.exchange(
-											createURLWithPort("/books"),
+											createURLWithPort("/customers"),
 											HttpMethod.POST, entity, JSONObject.class);	
 		assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
     }
     
     @Test
     public void shouldNotSaveCustomer_ifBalanceIsNotSpecified(){
-    	CustomerView customer = new CustomerView( 3L, "User3",null,"test");
+    	CustomerView customer = new CustomerView( 3L, "User3",null);
 		HttpEntity<CustomerView> entity = new HttpEntity<CustomerView>(customer, headers);
 
 		ResponseEntity<JSONObject> response = restTemplate.exchange(
-											createURLWithPort("/books"),
+											createURLWithPort("/customers"),
 											HttpMethod.POST, entity, JSONObject.class);	
 		assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
     }
 	
 	@Test
     public void shouldNotSaveCustomer_ifSpecifiedIdAlreadyExists(){
-		CustomerView customer = new CustomerView(2L,"User2",400D,"test");
+		CustomerView customer = new CustomerView(2L,"User2",400D);
 		HttpEntity<CustomerView> entity = new HttpEntity<CustomerView>(customer, headers);
 
 		ResponseEntity<JSONObject> response = restTemplate.exchange(
@@ -158,7 +158,7 @@ public class CustomerControllerTest {
 											HttpMethod.GET, null, CustomerView.class);
 		
 		CustomerView actual = response.getBody();
-		CustomerView expected = new CustomerView(2L,"User2", 400D,"test"); 
+		CustomerView expected = new CustomerView(2L,"User2", 400D); 
 		
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 		assertEquals(expected.id, actual.id);
@@ -222,7 +222,7 @@ public class CustomerControllerTest {
 	
 	@Test
     public void shouldUpdateBalance_ifCustomerWithSpecifiedIdExists() {
-		CustomerView customer = new CustomerView(null,null,500D,"test");
+		CustomerView customer = new CustomerView(null,null,500D);
 		HttpEntity<CustomerView> entity = new HttpEntity<CustomerView>(customer, headers);
 
 		ResponseEntity<JSONObject> response = restTemplate.exchange(
@@ -233,7 +233,7 @@ public class CustomerControllerTest {
 		ResponseEntity<CustomerView> response2 = restTemplate.exchange(createURLWithPort("/customers/2"),HttpMethod.GET, null, CustomerView.class);
 		CustomerView actual2 = response2.getBody(); 
 		System.out.println(actual2.id);
-		CustomerView expected2 = new CustomerView(2L,"User2", 500D,"test"); 
+		CustomerView expected2 = new CustomerView(2L,"User2", 500D); 
 
 		assertEquals(HttpStatus.OK, response2.getStatusCode());
 		assertEquals(expected2.id, actual2.id);
@@ -243,7 +243,7 @@ public class CustomerControllerTest {
 	
 	@Test
     public void shouldNotUpdateBalance_ifCustomerWithSpecifiedIdDoesNotExist() {
-		CustomerView customer = new CustomerView(null,null,500D,"test");
+		CustomerView customer = new CustomerView(null,null,500D);
 		HttpEntity<CustomerView> entity = new HttpEntity<CustomerView>(customer, headers);
 
 		ResponseEntity<JSONObject> response = restTemplate.exchange(

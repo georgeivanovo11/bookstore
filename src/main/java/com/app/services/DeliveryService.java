@@ -22,6 +22,9 @@ public class DeliveryService {
 	private WarehouseRepository wRepository;
 	
 	public void deliver(DeliveryView view) throws EntityNotFoundException, InvalidInputDataException {
+		if(view.books==null) {
+			 throw new InvalidInputDataException("books");
+		 }
 		for(BookItemView item: view.books) {
 			if(item.id == null) {throw new InvalidInputDataException("books.id");}
 			if(item.amount == null) {throw new InvalidInputDataException("books.amount");}

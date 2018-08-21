@@ -13,18 +13,12 @@ public class BookView{
 	public String author;
 	
 	 @JsonCreator
-	 public BookView(@JsonProperty(value = "id") Long id,
-			         @JsonProperty(value = "title", required = true) String title, 
-	                 @JsonProperty(value = "author", required = true) String author) throws InvalidInputDataException
+	 public BookView(@JsonProperty(value="id") Long id,
+			         @JsonProperty(value="title", required = true) String title, 
+	                 @JsonProperty(value="author", required = true) String author)
 	 {
 		 this.id = id;
-		 if(title==null) {
-			 throw new InvalidInputDataException("title");
-		 }
 		 this.title = title;
-		 if(author==null) {
-			 throw new InvalidInputDataException("author");
-		 }
 		 this.author = author;
 	 }
 	
@@ -35,13 +29,6 @@ public class BookView{
 	    this.id = book.getId();
 	    this.title = book.getTitle();
 	    this.author = book.getAuthor();
-	}
-	
-	 public BookView(Long id, String title, String author, String mode)
-	 {
-		 this.id = id;
-		 this.title = title;
-		 this.author = author;
-	 }
+	}	
 }
 

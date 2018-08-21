@@ -48,7 +48,7 @@ public class StoreControllerTest {
     
     @Test
     public void shouldSaveStoreWithAutoId_ifIdIsNotSpecified(){
-    	StoreView store = new StoreView(null,"shop3",300D,"test");
+    	StoreView store = new StoreView(null,"shop3",300D);
 		HttpEntity<StoreView> entity = new HttpEntity<StoreView>(store, headers);
 
 		ResponseEntity<StoreView> response = restTemplate.exchange(
@@ -65,7 +65,7 @@ public class StoreControllerTest {
     
     @Test
     public void shouldSaveStoreWithGivenId_ifIdIsSpecified(){
-    	StoreView store = new StoreView(99L,"shop99",500D,"test");
+    	StoreView store = new StoreView(99L,"shop99",500D);
 		HttpEntity<StoreView> entity = new HttpEntity<StoreView>(store, headers);
 
 		ResponseEntity<StoreView> response = restTemplate.exchange(
@@ -83,7 +83,7 @@ public class StoreControllerTest {
     
     @Test
     public void shouldNotSaveStore_ifTitleIsNotSpecified(){
-    	StoreView store = new StoreView(3L,null,500D,"test");
+    	StoreView store = new StoreView(3L,null,500D);
 		HttpEntity<StoreView> entity = new HttpEntity<StoreView>(store, headers);
 
 		ResponseEntity<JSONObject> response = restTemplate.exchange(
@@ -94,7 +94,7 @@ public class StoreControllerTest {
     
     @Test
     public void shouldNotSaveStore_ifBalanceIsNotSpecified(){
-    	StoreView store = new StoreView(3L,"shop",null,"test");
+    	StoreView store = new StoreView(3L,"shop",null);
 		HttpEntity<StoreView> entity = new HttpEntity<StoreView>(store, headers);
 
 		ResponseEntity<JSONObject> response = restTemplate.exchange(
@@ -105,7 +105,7 @@ public class StoreControllerTest {
     
     @Test
     public void shouldNotSaveStore_ifSpecifiedIdAlreadyExists(){
-    	StoreView store = new StoreView(2L,"shop",500D,"test");
+    	StoreView store = new StoreView(2L,"shop",500D);
 		HttpEntity<StoreView> entity = new HttpEntity<StoreView>(store, headers);
 
 		ResponseEntity<JSONObject> response = restTemplate.exchange(
@@ -121,7 +121,7 @@ public class StoreControllerTest {
 											HttpMethod.GET, null, StoreView.class);
 		
 		StoreView actual = response.getBody();
-		StoreView expected = new StoreView(2L,"shop2",200D,"test"); 
+		StoreView expected = new StoreView(2L,"shop2",200D); 
 		
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 		assertEquals(expected.id, actual.id);

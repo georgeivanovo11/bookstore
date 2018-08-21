@@ -28,6 +28,12 @@ public class CustomerService {
     private CustomerRepository repository;
 	
 	public Customer createCustomer(CustomerView view) throws EntityAlreadyExistsException, InvalidInputDataException {
+		if(view.name==null) {
+			 throw new InvalidInputDataException("name");
+		}
+		if(view.balance==null) {
+			 throw new InvalidInputDataException("balance");
+		}
 		if(view.id != null && repository.existsById(view.id)) {
 			throw new EntityAlreadyExistsException("customer", view.id);
 		}
@@ -48,13 +54,19 @@ public class CustomerService {
         return customers;
     }
 	
-	public void changeMoney(Long id, Double money) throws EntityNotFoundException, InvalidInputDataException {
+	public void changeMoney(Long id, Double balance) throws EntityNotFoundException, InvalidInputDataException {
+		if(id==null) {
+			 throw new InvalidInputDataException("id");
+		 }
+		if(balance==null) {
+			 throw new InvalidInputDataException("balance");
+		 }
 		Optional<Customer> _customer = repository.findById(id);
 		if (!_customer.isPresent()) {
             throw new EntityNotFoundException("customer",id);
         }
         Customer customer = _customer.get();
-        customer.setBalance(money);
+        customer.setBalance(balance);
         repository.save(customer);
 	}
 	

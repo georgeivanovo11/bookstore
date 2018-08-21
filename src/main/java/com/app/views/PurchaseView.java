@@ -18,16 +18,10 @@ public class PurchaseView {
 	@JsonCreator
 	public PurchaseView(@JsonProperty(value = "id") Long id,
 						@JsonProperty(value = "customer_id", required = true) Long customer_id,
-						@JsonProperty(value = "books", required = true) long[] books) throws InvalidInputDataException
+						@JsonProperty(value = "books", required = true) long[] books)
 	{
 		this.id=id;
-		if(customer_id==null) {
-			 throw new InvalidInputDataException("customer");
-		 }
 		this.customer_id = customer_id;
-		if(books==null) {
-			 throw new InvalidInputDataException("books");
-		 }
 		this.books = books;
 	}
 	
